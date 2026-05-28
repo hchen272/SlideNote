@@ -23,6 +23,8 @@
   --divider: #222244;
   --font-family: 'Consolas', 'Courier New', 'Microsoft YaHei', monospace;
   --parchment: none;
+  --tab-color: #0a0a1a;
+  --tab-color-dark: #660066;
 }
 
 .theme-cyberpunk .app-container {

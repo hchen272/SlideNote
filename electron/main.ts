@@ -20,7 +20,7 @@ const store = new Store({
 let mainWindow: BrowserWindow | null = null
 let isDocked = false
 let dockedEdge: 'left' | 'right' | null = null
-const DOCKED_WIDTH = 8
+const DOCKED_WIDTH = 10 // fallback, actual width calculated dynamically
 const NORMAL_WIDTH = 380
 const NORMAL_HEIGHT = 550
 
@@ -28,10 +28,11 @@ function createWindow() {
   const bounds = store.get('windowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT }) as any
   isDocked = store.get('isDocked', false) as boolean
   dockedEdge = store.get('dockedEdge', null) as 'left' | 'right' | null
+  const savedTabBounds = store.get('tabBounds', { width: DOCKED_WIDTH, height: NORMAL_HEIGHT }) as any
 
   mainWindow = new BrowserWindow({
-    width: isDocked ? DOCKED_WIDTH : (bounds.width || NORMAL_WIDTH),
-    height: isDocked ? (bounds.height || NORMAL_HEIGHT) : (bounds.height || NORMAL_HEIGHT),
+    width: isDocked ? (savedTabBounds.width || DOCKED_WIDTH) : (bounds.width || NORMAL_WIDTH),
+    height: isDocked ? (savedTabBounds.height || NORMAL_HEIGHT) : (bounds.height || NORMAL_HEIGHT),
     x: bounds.x,
     y: bounds.y,
     frame: false,
@@ -39,9 +40,9 @@ function createWindow() {
     backgroundColor: '#0a0a1a',
     alwaysOnTop: true,
     skipTaskbar: false,
-    resizable: true,
-    minWidth: 300,
-    minHeight: 200,
+    resizable: !isDocked,
+    minWidth: isDocked ? undefined : 300,
+    minHeight: isDocked ? undefined : 200,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -86,14 +87,14 @@ function handleEdgeSnap() {
   const bounds = mainWindow.getBounds()
   const SNAP_THRESHOLD = 15
 
-  // Check if window is near left edge
+  // Snap to left edge (small gap prevents resize trigger)
   if (Math.abs(bounds.x - screenX) <= SNAP_THRESHOLD) {
-    mainWindow.setPosition(screenX, bounds.y)
+    mainWindow.setPosition(screenX + 1, bounds.y)
   }
 
-  // Check if window is near right edge
+  // Snap to right edge (gap prevents Windows resize-on-edge behavior)
   if (Math.abs((bounds.x + bounds.width) - (screenX + screenWidth)) <= SNAP_THRESHOLD) {
-    mainWindow.setPosition(screenX + screenWidth - bounds.width, bounds.y)
+    mainWindow.setPosition(screenX + screenWidth - bounds.width - 1, bounds.y)
   }
 }
 
@@ -104,11 +105,15 @@ function toggleDock() {
   if (isDocked) {
     // Undock: restore to previously saved size
     const savedEdge = dockedEdge
-    const savedBounds = store.get('windowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT, x: 100, y: 100 }) as any
+    const savedBounds = store.get('WindowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT, x: 100, y: 100 }) as any
     isDocked = false
     dockedEdge = null
     const savedWidth = savedBounds.width || NORMAL_WIDTH
     const savedHeight = savedBounds.height || NORMAL_HEIGHT
+
+    // Re-enable resize and min size
+    mainWindow.setResizable(true)
+    mainWindow.setMinimumSize(300, 200)
 
     // Position near the previously docked edge but fully visible
     const cursorPoint = screen.getCursorScreenPoint()
@@ -117,7 +122,7 @@ function toggleDock() {
 
     if (savedEdge === 'left') {
       mainWindow.setBounds({
-        x: screenX + 10,
+        x: screenX,
         y: savedBounds.y || 100,
         width: savedWidth,
         height: savedHeight,
@@ -132,36 +137,49 @@ function toggleDock() {
     }
     mainWindow.setAlwaysOnTop(true, 'floating')
   } else {
-    // Dock: shrink to edge bar
+    // Dock: shrink to a small bookmark tab
     const bounds = mainWindow.getBounds()
     const cursorPoint = screen.getCursorScreenPoint()
     const currentDisplay = screen.getDisplayNearestPoint(cursorPoint)
-    const { x: screenX, width: screenWidth, height: screenHeight, y: screenY } = currentDisplay.workArea
+    const { x: screenX, y: screenY, width: screenWidth, height: screenHeight } = currentDisplay.workArea
 
+    // Save current bounds BEFORE changing isDocked
     store.set('windowBounds', bounds)
 
     // Determine which edge to dock to
     const distToLeft = bounds.x - screenX
     const distToRight = (screenX + screenWidth) - (bounds.x + bounds.width)
 
-    if (distToLeft <= distToRight) {
+    const tabHeight = Math.round(screenHeight * 0.04)
+    const tabWidth = Math.round(tabHeight * 0.30)
+    const tabY = Math.round(screenY + (screenHeight - tabHeight) / 2)
+
+    // Save tab dimensions for restart
+    store.set('tabBounds', { width: tabWidth, height: tabHeight })
+
+    if (distToLeft < distToRight) {
       dockedEdge = 'left'
+      isDocked = true
+      mainWindow.setResizable(false)
+      mainWindow.setMinimumSize(tabWidth, tabHeight)
       mainWindow.setBounds({
         x: screenX,
-        y: Math.round(screenY + screenHeight * 0.2),
-        width: DOCKED_WIDTH,
-        height: Math.round(screenHeight * 0.45),
+        y: tabY,
+        width: tabWidth,
+        height: tabHeight,
       })
     } else {
       dockedEdge = 'right'
+      isDocked = true
+      mainWindow.setResizable(false)
+      mainWindow.setMinimumSize(tabWidth, tabHeight)
       mainWindow.setBounds({
-        x: screenX + screenWidth - DOCKED_WIDTH,
-        y: Math.round(screenY + screenHeight * 0.2),
-        width: DOCKED_WIDTH,
-        height: Math.round(screenHeight * 0.45),
+        x: screenX + screenWidth - tabWidth,
+        y: tabY,
+        width: tabWidth,
+        height: tabHeight,
       })
     }
-    isDocked = true
   }
 
   store.set('isDocked', isDocked)
@@ -219,6 +237,41 @@ ipcMain.handle('close-window', () => {
 
 ipcMain.handle('get-themes', () => {
   return ['cyberpunk', 'nature', 'medieval']
+})
+
+// ---- Window drag for docked tab ----
+let dragInterval: NodeJS.Timeout | null = null
+
+ipcMain.on('start-drag', (_event, startX: number, startY: number) => {
+  if (!mainWindow || !isDocked) return
+  const startBounds = mainWindow.getBounds()
+
+  dragInterval = setInterval(() => {
+    if (!mainWindow) return
+    const cursor = screen.getCursorScreenPoint()
+    const newY = startBounds.y + (cursor.y - startY)
+    // Clamp Y within work area so tab doesn't go off-screen
+    const display = screen.getDisplayNearestPoint(cursor)
+    const { y: screenY, height: screenHeight } = display.workArea
+    const clampedY = Math.max(screenY, Math.min(screenY + screenHeight - startBounds.height, newY))
+    mainWindow.setBounds({
+      x: startBounds.x,
+      y: Math.round(clampedY),
+      width: startBounds.width,
+      height: startBounds.height,
+    })
+  }, 16)
+})
+
+ipcMain.on('stop-drag', () => {
+  if (dragInterval) {
+    clearInterval(dragInterval)
+    dragInterval = null
+  }
+  // Save new tab position
+  if (mainWindow && isDocked) {
+    store.set('windowBounds', mainWindow.getBounds())
+  }
 })
 
 // ---- App Lifecycle ----

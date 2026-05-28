@@ -30,20 +30,19 @@ body {
   overflow: hidden;
 }
 
-/* Docked state — thin bookmark tab */
+/* Docked state — drag to move, click to expand */
 .app-container.docked {
   border-radius: 0;
-  cursor: pointer;
+  cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-speed) ease;
-  opacity: 0.7;
+  transition: box-shadow 0.2s ease;
   overflow: hidden;
 }
 
-.app-container.docked:hover {
-  opacity: 1;
+.app-container.docked:active {
+  cursor: grabbing;
 }
 
 .app-container.docked.left {
@@ -54,19 +53,20 @@ body {
   border-radius: 4px 0 0 4px;
 }
 
-/* The thin accent strip inside the docked tab */
+/* Solid color tab */
 .dock-tab-strip {
-  width: 3px;
-  height: 60%;
-  border-radius: 2px;
-  background: var(--accent-primary);
-  box-shadow: 0 0 6px var(--accent-primary);
-  transition: all var(--transition-speed) ease;
+  width: 100%;
+  height: 100%;
+  background: var(--tab-color);
+  transition: filter 0.2s ease;
 }
 
 .app-container.docked:hover .dock-tab-strip {
-  width: 4px;
-  box-shadow: 0 0 12px var(--accent-primary);
+  filter: brightness(1.6);
+}
+
+.app-container.docked:hover {
+  box-shadow: 0 0 14px 2px var(--tab-color);
 }
 
 /* Scrollbar styling */

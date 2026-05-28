@@ -23,6 +23,8 @@
   --divider: #335533;
   --font-family: 'Georgia', 'Microsoft YaHei', serif;
   --parchment: none;
+  --tab-color: #1a2f1a;
+  --tab-color-dark: #2d5530;
 }
 
 .theme-nature .app-container {

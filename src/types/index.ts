@@ -46,6 +46,8 @@ export interface ElectronAPI {
   minimizeWindow: () => Promise<void>
   maximizeWindow: () => Promise<void>
   closeWindow: () => Promise<void>
+  startDrag: (startX: number, startY: number) => void
+  stopDrag: () => void
   getThemes: () => Promise<string[]>
 }
 

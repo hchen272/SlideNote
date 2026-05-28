@@ -23,6 +23,8 @@
   --divider: #4a3528;
   --font-family: 'Cinzel', 'Georgia', 'Microsoft YaHei', serif;
   --parchment: radial-gradient(ellipse at center, rgba(139, 115, 85, 0.15) 0%, transparent 70%);
+  --tab-color: #2a1f14;
+  --tab-color-dark: #5a4010;
 }
 
 .theme-medieval .app-container {

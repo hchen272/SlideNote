@@ -27,7 +27,6 @@ export default function ThemeSwitcher() {
               title={themeInfo[t].label}
             >
               <span className="theme-option-icon">{themeInfo[t].icon}</span>
-              <span className="theme-option-label">{themeInfo[t].label}</span>
             </button>
           ))}
         </div>

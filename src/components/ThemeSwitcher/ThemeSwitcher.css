@@ -36,7 +36,7 @@
   border-radius: 6px;
   padding: 4px;
   z-index: 100;
-  min-width: 120px;
+  min-width: 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -49,8 +49,8 @@
 .theme-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  justify-content: center;
+  padding: 6px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-primary);
@@ -59,7 +59,6 @@
   border-radius: 4px;
   font-family: var(--font-family);
   transition: all 0.15s;
-  white-space: nowrap;
 }
 
 .theme-option:hover {
@@ -74,8 +73,4 @@
 
 .theme-option-icon {
   font-size: 16px;
-}
-
-.theme-option-label {
-  font-size: 11px;
 }

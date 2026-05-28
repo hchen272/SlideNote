@@ -21,6 +21,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   maximizeWindow: () => ipcRenderer.invoke('maximize-window'),
   closeWindow: () => ipcRenderer.invoke('close-window'),
 
+  // Window drag (for docked tab)
+  startDrag: (startX: number, startY: number) => ipcRenderer.send('start-drag', startX, startY),
+  stopDrag: () => ipcRenderer.send('stop-drag'),
+
   // Themes
   getThemes: () => ipcRenderer.invoke('get-themes'),
 })

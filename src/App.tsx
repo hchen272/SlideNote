@@ -35,13 +35,43 @@ function AppContent() {
     }
   }, [])
 
-  // When docked, show a thin bookmark-like tab
+  // When docked: click to expand, drag to move along edge
   if (isDocked) {
+    const handlePointerDown = (e: React.PointerEvent) => {
+      const el = e.currentTarget as HTMLElement
+      el.setPointerCapture(e.pointerId)
+
+      const startX = e.screenX
+      const startY = e.screenY
+      let dragged = false
+
+      const onMove = (ev: PointerEvent) => {
+        if (!dragged && (Math.abs(ev.screenX - startX) > 3 || Math.abs(ev.screenY - startY) > 3)) {
+          dragged = true
+          window.electronAPI?.startDrag(startX, startY)
+        }
+      }
+
+      const onUp = () => {
+        el.releasePointerCapture(e.pointerId)
+        el.removeEventListener('pointermove', onMove)
+        el.removeEventListener('pointerup', onUp)
+        if (dragged) {
+          window.electronAPI?.stopDrag()
+        } else {
+          window.electronAPI?.toggleDock()
+        }
+      }
+
+      el.addEventListener('pointermove', onMove)
+      el.addEventListener('pointerup', onUp)
+    }
+
     return (
       <div
         className={`app-container docked ${dockedEdge} theme-${theme}`}
-        onClick={() => window.electronAPI?.toggleDock()}
-        title="点击展开便签"
+        onPointerDown={handlePointerDown}
+        title="点击展开 / 拖拽移动"
       >
         <div className="dock-tab-strip" />
       </div>
