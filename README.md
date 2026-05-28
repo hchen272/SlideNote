@@ -4,6 +4,8 @@
 
 [中文](ChineseVersion.md)
 
+> ⚠️ **This project is under active development.** A one-click installer (`.exe` setup) will be available soon. For now, see [Setup](#setup) to run from source.
+
 ---
 
 ## Why This Exists
