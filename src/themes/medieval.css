@@ -1,0 +1,51 @@
+.theme-medieval {
+  --bg-primary: #2a1f14;
+  --bg-secondary: #35291c;
+  --bg-tertiary: #453525;
+  --bg-hover: #554430;
+  --bg-input: #2f2216;
+  --text-primary: #e8d5b0;
+  --text-secondary: #b8956a;
+  --text-muted: #7a6040;
+  --accent-primary: #daa520;
+  --accent-secondary: #8b4513;
+  --accent-warn: #cd853f;
+  --border-color: #5a4028;
+  --border-glow: rgba(218, 165, 32, 0.15);
+  --shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  --gradient-bg: linear-gradient(180deg, #2a1f14 0%, #35291c 50%, #2a1f14 100%);
+  --titlebar-bg: #1f150e;
+  --sidebar-bg: #251a10;
+  --weather-bg: #251a10;
+  --todo-checked: #daa520;
+  --button-primary: #daa520;
+  --button-hover: #b8860b;
+  --divider: #4a3528;
+  --font-family: 'Cinzel', 'Georgia', 'Microsoft YaHei', serif;
+  --parchment: radial-gradient(ellipse at center, rgba(139, 115, 85, 0.15) 0%, transparent 70%);
+}
+
+.theme-medieval .app-container {
+  background: var(--bg-primary);
+  background-image: var(--parchment);
+  border: 2px solid var(--border-color);
+  border-image: linear-gradient(to bottom, #8b7355, #5a4028, #8b7355) 1;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6), inset 0 0 50px rgba(0, 0, 0, 0.3);
+}
+
+.theme-medieval .app-container::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: 1px solid rgba(218, 165, 32, 0.1);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.theme-medieval.docked {
+  border: 2px solid var(--accent-primary);
+  box-shadow: 0 0 10px rgba(218, 165, 32, 0.3);
+}

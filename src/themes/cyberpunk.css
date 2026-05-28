@@ -1,0 +1,37 @@
+.theme-cyberpunk {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #12122a;
+  --bg-tertiary: #1a1a3e;
+  --bg-hover: #252550;
+  --bg-input: #0d0d24;
+  --text-primary: #e0e0ff;
+  --text-secondary: #8888cc;
+  --text-muted: #5555aa;
+  --accent-primary: #00ff88;
+  --accent-secondary: #ff00ff;
+  --accent-warn: #ffcc00;
+  --border-color: #333366;
+  --border-glow: rgba(0, 255, 136, 0.3);
+  --shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+  --gradient-bg: linear-gradient(135deg, #0a0a1a 0%, #1a0030 50%, #0a0a1a 100%);
+  --titlebar-bg: #080818;
+  --sidebar-bg: #0d0d24;
+  --weather-bg: #0d0d24;
+  --todo-checked: #00ff88;
+  --button-primary: #00ff88;
+  --button-hover: #00cc66;
+  --divider: #222244;
+  --font-family: 'Consolas', 'Courier New', 'Microsoft YaHei', monospace;
+  --parchment: none;
+}
+
+.theme-cyberpunk .app-container {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 15px var(--border-glow), inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.theme-cyberpunk.docked {
+  border: 1px solid var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary);
+}
