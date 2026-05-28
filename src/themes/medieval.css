@@ -46,6 +46,5 @@
 }
 
 .theme-medieval.docked {
-  border: 2px solid var(--accent-primary);
-  box-shadow: 0 0 10px rgba(218, 165, 32, 0.3);
+  background: var(--bg-primary);
 }

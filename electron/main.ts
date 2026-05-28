@@ -20,7 +20,7 @@ const store = new Store({
 let mainWindow: BrowserWindow | null = null
 let isDocked = false
 let dockedEdge: 'left' | 'right' | null = null
-const DOCKED_WIDTH = 48
+const DOCKED_WIDTH = 8
 const NORMAL_WIDTH = 380
 const NORMAL_HEIGHT = 550
 
@@ -35,7 +35,8 @@ function createWindow() {
     x: bounds.x,
     y: bounds.y,
     frame: false,
-    transparent: true,
+    transparent: false,
+    backgroundColor: '#0a0a1a',
     alwaysOnTop: true,
     skipTaskbar: false,
     resizable: true,
@@ -101,21 +102,33 @@ function toggleDock() {
   if (!mainWindow) return
 
   if (isDocked) {
-    // Undock: restore to normal size
-    const bounds = store.get('windowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT }) as any
+    // Undock: restore to previously saved size
+    const savedEdge = dockedEdge
+    const savedBounds = store.get('windowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT, x: 100, y: 100 }) as any
     isDocked = false
     dockedEdge = null
-    mainWindow.setSize(NORMAL_WIDTH, bounds.height || NORMAL_HEIGHT)
+    const savedWidth = savedBounds.width || NORMAL_WIDTH
+    const savedHeight = savedBounds.height || NORMAL_HEIGHT
 
-    // Position near the docked edge but fully visible
+    // Position near the previously docked edge but fully visible
     const cursorPoint = screen.getCursorScreenPoint()
     const currentDisplay = screen.getDisplayNearestPoint(cursorPoint)
-    const { x: screenX } = currentDisplay.workArea
+    const { x: screenX, width: screenWidth } = currentDisplay.workArea
 
-    if (bounds.x && bounds.x <= 100) {
-      mainWindow.setPosition(screenX + 10, bounds.y || 100)
+    if (savedEdge === 'left') {
+      mainWindow.setBounds({
+        x: screenX + 10,
+        y: savedBounds.y || 100,
+        width: savedWidth,
+        height: savedHeight,
+      })
     } else {
-      mainWindow.setPosition(screenX + currentDisplay.workArea.width - NORMAL_WIDTH - 10, bounds.y || 100)
+      mainWindow.setBounds({
+        x: screenX + screenWidth - savedWidth - 10,
+        y: savedBounds.y || 100,
+        width: savedWidth,
+        height: savedHeight,
+      })
     }
     mainWindow.setAlwaysOnTop(true, 'floating')
   } else {

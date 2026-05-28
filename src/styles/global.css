@@ -18,7 +18,7 @@ html, body, #root {
 }
 
 body {
-  background: transparent;
+  background: var(--bg-primary, #0a0a1a);
 }
 
 .app-container {
@@ -30,19 +30,16 @@ body {
   overflow: hidden;
 }
 
-/* Docked state */
+/* Docked state — thin bookmark tab */
 .app-container.docked {
   border-radius: 0;
   cursor: pointer;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  letter-spacing: 4px;
   transition: all var(--transition-speed) ease;
-  opacity: 0.85;
+  opacity: 0.7;
+  overflow: hidden;
 }
 
 .app-container.docked:hover {
@@ -50,11 +47,26 @@ body {
 }
 
 .app-container.docked.left {
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 4px 4px 0;
 }
 
 .app-container.docked.right {
-  border-radius: 8px 0 0 8px;
+  border-radius: 4px 0 0 4px;
+}
+
+/* The thin accent strip inside the docked tab */
+.dock-tab-strip {
+  width: 3px;
+  height: 60%;
+  border-radius: 2px;
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-primary);
+  transition: all var(--transition-speed) ease;
+}
+
+.app-container.docked:hover .dock-tab-strip {
+  width: 4px;
+  box-shadow: 0 0 12px var(--accent-primary);
 }
 
 /* Scrollbar styling */

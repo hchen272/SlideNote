@@ -33,6 +33,5 @@
 }
 
 .theme-nature.docked {
-  border: 1px solid var(--accent-primary);
-  box-shadow: 0 0 8px rgba(125, 223, 144, 0.3);
+  background: var(--bg-primary);
 }

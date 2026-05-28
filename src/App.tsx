@@ -14,6 +14,11 @@ function AppContent() {
 
   const activeNote = notes.find(n => n.id === activeNoteId)
 
+  // Sync theme class to body so CSS variables affect the entire window
+  useEffect(() => {
+    document.body.className = `theme-${theme}`
+  }, [theme])
+
   useEffect(() => {
     // Get initial dock state
     if (window.electronAPI) {
@@ -30,7 +35,7 @@ function AppContent() {
     }
   }, [])
 
-  // When docked, show a minimal bar
+  // When docked, show a thin bookmark-like tab
   if (isDocked) {
     return (
       <div
@@ -38,9 +43,7 @@ function AppContent() {
         onClick={() => window.electronAPI?.toggleDock()}
         title="点击展开便签"
       >
-        <span style={{ fontSize: '12px', letterSpacing: '2px' }}>
-          📝 Sticky Notes
-        </span>
+        <div className="dock-tab-strip" />
       </div>
     )
   }
