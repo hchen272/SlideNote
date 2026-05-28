@@ -1,4 +1,4 @@
-# Sticky Notes（便签）
+# Slide Notes（PPT笔记）
 
 > 一个桌面便签应用：永远置顶、可吸附到屏幕边缘如书签、支持 Markdown 与多主题。
 
@@ -10,13 +10,15 @@
 
 ## 为什么做这个
 
-现有的电脑便签工具有两个痛点：
+实际上是复习的时候遭不住分屏记笔记，也懒得用笔去记... Windows自带的左右分屏又很容易被覆盖。
+
+官方讲来，现有的电脑便签工具有两个痛点：
 
 1. **不能真正置顶。** Windows 自带便签、macOS 便条等，一切换窗口就被挡住。读 Slides、看视频、查资料时，笔记应该**持续可见**，而不是藏在窗口背后。
 
 2. **占地方或难切换。** 传统笔记软件要么占屏幕空间，要么需要反复 Alt-Tab。理想方案是让笔记**活在屏幕边缘**——随时可用，从不碍事。
 
-**Sticky Notes** 解决了这两个问题：始终置顶（全屏应用除外），一键收缩成屏幕边缘的彩色小标签，再点一下恢复完整窗口，笔记全部保留。
+**Slide Notes** 解决了这两个问题：始终置顶（全屏应用除外），一键收缩成屏幕边缘的彩色小标签，再点一下恢复完整窗口，笔记全部保留。
 
 **核心场景：** 边看 Slides / PDF / 视频课边做笔记，无需来回切窗口。
 
@@ -46,7 +48,7 @@
 
 ```bash
 # 克隆仓库
-git clone <your-repo-url>
+git clone https://github.com/hchen272/SlideNote.git
 cd sticky-notes
 
 # 安装依赖
@@ -55,17 +57,6 @@ npm install
 # 开发模式启动
 npm run electron:dev
 ```
-
-`.gitignore` 仅忽略 `node_modules/` 和 `dist-electron/`，因此克隆后执行上述命令即可运行。
-
-### 打包发布
-
-```bash
-npm run electron:build
-```
-
-打包后的应用在 `release/` 目录下。
-
 ---
 
 ## 操作指南
@@ -145,5 +136,6 @@ C:\Users\<用户名>\AppData\Roaming\sticky-notes\config.json
 - [ ] 可视化界面优化
 - [ ] 笔记结构树
 - [ ] 更多主题？
+- [ ] 与对应PPT关联 (灵感来源于ShareNote Engine 早期计划)
 
 ---

@@ -1,4 +1,4 @@
-# Sticky Notes
+# Slide Notes
 
 > A desktop sticky-note app that stays on top, docks to the screen edge like a bookmark, and supports Markdown with themes.
 
@@ -10,13 +10,15 @@
 
 ## Why This Exists
 
-Modern OS sticky-note tools have two fundamental flaws:
+In fact, when reviewing, I can't handle split-screen note-taking, and I'm too lazy to use pen to write... The left-right split-screen in Windows is also easily covered.
+
+Officially saying, Modern OS sticky-note tools have two fundamental flaws:
 
 1. **They don't stay on top.** Most built-in note apps (Sticky Notes on Windows, Stickies on macOS) get buried the moment you switch to another window. When you're reading a slide deck, watching a lecture, or referencing a document, your notes should be *persistently visible* — not hiding behind your active window.
 
 2. **They take up too much space or are awkward to reach.** Traditional note apps either occupy valuable screen real estate or require Alt-Tab juggling. You need something that lives at the edge of your screen — always there, never in the way.
 
-**Sticky Notes** solves both: it's always-on-top (except over fullscreen apps) and collapses into a tiny colored tab docked to the left or right edge of your screen. One click and it expands back to full size with all your notes intact.
+**Slide Notes** solves both: it's always-on-top (except over fullscreen apps) and collapses into a tiny colored tab docked to the left or right edge of your screen. One click and it expands back to full size with all your notes intact.
 
 **Core use case:** taking notes while reading slides, PDFs, or watching video lectures — without constantly switching windows.
 
@@ -46,7 +48,7 @@ Modern OS sticky-note tools have two fundamental flaws:
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/hchen272/SlideNote.git
 cd sticky-notes
 
 # Install dependencies
@@ -55,15 +57,6 @@ npm install
 # Start the app in development mode
 npm run electron:dev
 ```
-
-### Build for Distribution
-
-```bash
-npm run electron:build
-```
-
-The packaged app will be in the `release/` folder.
-
 ---
 
 ## Usage
@@ -143,5 +136,6 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - [ ] UI / visual improvements
 - [ ] Note tree structure
 - [ ] More themes?
+- [ ] Associated to corresponding slides (Inspired by the early plans of ShareNote Engine)
 
 ---
