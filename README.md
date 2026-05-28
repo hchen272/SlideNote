@@ -122,6 +122,26 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 
 ---
 
-## License
+## Roadmap
 
-MIT
+### Done
+
+- [x] Always-on-top window with fullscreen-aware layering
+- [x] Edge-docking: collapse to a draggable colored tab, expand with a click
+- [x] 3 themes: Cyberpunk, Nature, Medieval
+- [x] Markdown editing with live preview
+- [x] TODO lists with checkable checkboxes (`- [ ]` / `- [x]`)
+- [x] Note management: create, delete, search, sort (by created / modified / word count)
+- [x] Per-note font customization (size, weight, color)
+- [x] Custom data storage path via Settings panel
+- [x] Local persistence with `electron-store`
+
+### Up Next
+
+- [ ] Chinese / English bilingual support
+- [ ] Rich-text (non-Markdown) note editing
+- [ ] UI / visual improvements
+- [ ] Note tree structure
+- [ ] More themes?
+
+---
