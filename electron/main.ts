@@ -1,8 +1,32 @@
 import { app, BrowserWindow, ipcMain, screen, globalShortcut } from 'electron'
 import { join } from 'path'
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import Store from 'electron-store'
 
+// ---- Custom data path support ----
+const configPath = join(app.getPath('userData'), 'sticky-notes-path.json')
+
+function getDataPath(): string {
+  try {
+    if (existsSync(configPath)) {
+      const cfg = JSON.parse(readFileSync(configPath, 'utf-8'))
+      if (cfg.dataPath && existsSync(cfg.dataPath)) {
+        return cfg.dataPath
+      }
+    }
+  } catch { /* ignore */ }
+  return app.getPath('userData')
+}
+
+function setDataPath(newPath: string): void {
+  if (!existsSync(newPath)) {
+    mkdirSync(newPath, { recursive: true })
+  }
+  writeFileSync(configPath, JSON.stringify({ dataPath: newPath }), 'utf-8')
+}
+
 const store = new Store({
+  cwd: getDataPath(),
   defaults: {
     windowBounds: { width: 380, height: 550, x: undefined, y: undefined },
     dockedEdge: null as 'left' | 'right' | null,
@@ -105,7 +129,7 @@ function toggleDock() {
   if (isDocked) {
     // Undock: restore to previously saved size
     const savedEdge = dockedEdge
-    const savedBounds = store.get('WindowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT, x: 100, y: 100 }) as any
+    const savedBounds = store.get('windowBounds', { width: NORMAL_WIDTH, height: NORMAL_HEIGHT, x: 100, y: 100 }) as any
     isDocked = false
     dockedEdge = null
     const savedWidth = savedBounds.width || NORMAL_WIDTH
@@ -229,14 +253,21 @@ ipcMain.handle('maximize-window', () => {
 })
 
 ipcMain.handle('close-window', () => {
-  // Minimize to tray behavior: just dock or hide
-  if (!isDocked) {
-    toggleDock()
-  }
+  app.quit()
 })
 
 ipcMain.handle('get-themes', () => {
   return ['cyberpunk', 'nature', 'medieval']
+})
+
+// ---- Data path ----
+ipcMain.handle('get-data-path', () => {
+  return getDataPath()
+})
+
+ipcMain.handle('set-data-path', (_event, newPath: string) => {
+  setDataPath(newPath)
+  return true
 })
 
 // ---- Window drag for docked tab ----
@@ -268,9 +299,9 @@ ipcMain.on('stop-drag', () => {
     clearInterval(dragInterval)
     dragInterval = null
   }
-  // Save new tab position
+  // Save tab Y separately — never overwrite windowBounds with docked size!
   if (mainWindow && isDocked) {
-    store.set('windowBounds', mainWindow.getBounds())
+    store.set('tabPosition', { y: mainWindow.getBounds().y })
   }
 })
 

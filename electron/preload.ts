@@ -25,6 +25,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   startDrag: (startX: number, startY: number) => ipcRenderer.send('start-drag', startX, startY),
   stopDrag: () => ipcRenderer.send('stop-drag'),
 
+  // Data path
+  getDataPath: () => ipcRenderer.invoke('get-data-path'),
+  setDataPath: (path: string) => ipcRenderer.invoke('set-data-path', path),
+
   // Themes
   getThemes: () => ipcRenderer.invoke('get-themes'),
 })

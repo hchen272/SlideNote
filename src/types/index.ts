@@ -48,6 +48,8 @@ export interface ElectronAPI {
   closeWindow: () => Promise<void>
   startDrag: (startX: number, startY: number) => void
   stopDrag: () => void
+  getDataPath: () => Promise<string>
+  setDataPath: (path: string) => Promise<boolean>
   getThemes: () => Promise<string[]>
 }
 

@@ -6,9 +6,10 @@ import './Sidebar.css'
 
 interface SidebarProps {
   isOpen: boolean
+  onOpenSettings: () => void
 }
 
-export default function Sidebar({ isOpen }: SidebarProps) {
+export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
   const {
     sortedNotes,
     activeNoteId,
@@ -101,6 +102,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         {sortedNotes.length === 0 && (
           <div className="no-notes">暂无便签</div>
         )}
+      </div>
+
+      <div className="sidebar-footer">
+        <button className="sidebar-settings-btn" onClick={onOpenSettings} title="设置">
+          ⚙
+        </button>
       </div>
     </div>
   )

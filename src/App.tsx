@@ -4,6 +4,7 @@ import { NotesProvider, useNotes } from './contexts/NotesContext'
 import TitleBar from './components/TitleBar/TitleBar'
 import Sidebar from './components/Sidebar/Sidebar'
 import Editor from './components/Editor/Editor'
+import SettingsModal from './components/Settings/SettingsModal'
 
 function AppContent() {
   const { theme } = useTheme()
@@ -11,6 +12,7 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isDocked, setIsDocked] = useState(false)
   const [dockedEdge, setDockedEdge] = useState<string | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const activeNote = notes.find(n => n.id === activeNoteId)
 
@@ -87,9 +89,10 @@ function AppContent() {
         sidebarOpen={sidebarOpen}
       />
       <div className="app-body">
-        <Sidebar isOpen={sidebarOpen} />
+        <Sidebar isOpen={sidebarOpen} onOpenSettings={() => setSettingsOpen(true)} />
         <Editor />
       </div>
+      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

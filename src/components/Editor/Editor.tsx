@@ -3,7 +3,6 @@ import { useNotes } from '../../contexts/NotesContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { renderMarkdown, extractTodoStats, toggleTodoInText } from '../../utils/markdown'
 import Toolbar from '../Toolbar/Toolbar'
-import WeatherBar from '../WeatherBar/WeatherBar'
 import './Editor.css'
 
 export default function Editor() {
@@ -157,8 +156,6 @@ export default function Editor() {
           />
         )}
       </div>
-
-      <WeatherBar />
     </div>
   )
 }
