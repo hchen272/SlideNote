@@ -50,6 +50,7 @@ export interface ElectronAPI {
   stopDrag: () => void
   getDataPath: () => Promise<string>
   setDataPath: (path: string) => Promise<boolean>
+  pickFolder: () => Promise<string | null>
   getThemes: () => Promise<string[]>
 }
 

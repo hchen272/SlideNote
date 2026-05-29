@@ -54,7 +54,7 @@ const zh = {
     title: '设置',
     dataPathLabel: '数据存储路径',
     save: '保存',
-    pathHint: '✅ 路径已保存。下次启动应用时将使用新路径。',
+    pathHint: '✅ 路径已保存，数据已迁移',
     pathHint2: '当前数据仍在原位置，如需迁移请手动复制。',
     currentPath: '当前路径：',
     languageLabel: '界面语言',

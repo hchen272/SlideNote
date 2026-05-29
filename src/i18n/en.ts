@@ -56,7 +56,7 @@ const en: Translations = {
     title: 'Settings',
     dataPathLabel: 'Data storage path',
     save: 'Save',
-    pathHint: '✅ Path saved. The new path will be used on next launch.',
+    pathHint: '✅ Path saved, data migrated',
     pathHint2: 'Current data is still in the old location. Copy it manually if needed.',
     currentPath: 'Current path: ',
     languageLabel: 'Language',

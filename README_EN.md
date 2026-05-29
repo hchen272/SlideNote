@@ -129,6 +129,7 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - [x] Custom data storage path via Settings panel
 - [x] Local persistence with `electron-store`
 - [x] Chinese / English bilingual support
+- [x] More convenient data migration
 
 ### Up Next
 

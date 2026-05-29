@@ -1,6 +1,6 @@
-import { app, BrowserWindow, ipcMain, screen, globalShortcut } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, globalShortcut, dialog } from 'electron'
 import { join } from 'path'
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs'
 import Store from 'electron-store'
 
 // ---- Custom data path support ----
@@ -19,26 +19,52 @@ function getDataPath(): string {
 }
 
 function setDataPath(newPath: string): void {
+  const oldPath = getDataPath()
+
+  // Read all current data from the in-memory store
+  const allKeys = ['windowBounds', 'isDocked', 'dockedEdge', 'theme', 'notes', 'settings', 'language', 'tabBounds', 'tabPosition']
+  const data: Record<string, any> = {}
+  for (const key of allKeys) {
+    data[key] = store.get(key)
+  }
+
   if (!existsSync(newPath)) {
     mkdirSync(newPath, { recursive: true })
   }
-  writeFileSync(configPath, JSON.stringify({ dataPath: newPath }), 'utf-8')
-}
 
-const store = new Store({
-  cwd: getDataPath(),
-  defaults: {
-    windowBounds: { width: 380, height: 550, x: undefined, y: undefined },
-    dockedEdge: null as 'left' | 'right' | null,
-    isDocked: false,
-    theme: 'cyberpunk',
-    notes: [],
-    settings: {
-      fontSize: 14,
-      fontWeight: 'normal',
-      fontColor: '#ffffff',
+  writeFileSync(configPath, JSON.stringify({ dataPath: newPath }), 'utf-8')
+
+  // Replace store with new one pointing to the new path
+  store = new Store({ cwd: newPath, defaults: storeDefaults })
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      store.set(key, value)
     }
   }
+
+  // Delete old config file
+  const oldConfig = join(oldPath, 'config.json')
+  if (existsSync(oldConfig) && oldPath !== newPath) {
+    unlinkSync(oldConfig)
+  }
+}
+
+const storeDefaults = {
+  windowBounds: { width: 380, height: 550, x: undefined, y: undefined },
+  dockedEdge: null as 'left' | 'right' | null,
+  isDocked: false,
+  theme: 'cyberpunk',
+  notes: [],
+  settings: {
+    fontSize: 14,
+    fontWeight: 'normal',
+    fontColor: '#ffffff',
+  }
+}
+
+let store = new Store({
+  cwd: getDataPath(),
+  defaults: storeDefaults,
 })
 
 let mainWindow: BrowserWindow | null = null
@@ -268,6 +294,15 @@ ipcMain.handle('get-data-path', () => {
 ipcMain.handle('set-data-path', (_event, newPath: string) => {
   setDataPath(newPath)
   return true
+})
+
+ipcMain.handle('pick-folder', async () => {
+  if (!mainWindow) return null
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory'],
+    title: '选择数据存储文件夹',
+  })
+  return result.canceled ? null : result.filePaths[0]
 })
 
 // ---- Window drag for docked tab ----

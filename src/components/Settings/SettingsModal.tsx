@@ -64,12 +64,20 @@ export default function SettingsModal({ isOpen, onClose }: Props) {
               onChange={e => setNewPath(e.target.value)}
               placeholder="C:\Users\..."
             />
+            <button
+              className="settings-browse-btn"
+              onClick={async () => {
+                const folder = await window.electronAPI?.pickFolder()
+                if (folder) setNewPath(folder)
+              }}
+            >
+              ...
+            </button>
             <button className="settings-save-btn" onClick={handleSave}>{t.settings.save}</button>
           </div>
           {saved && (
             <p className="settings-hint">
-              {t.settings.pathHint}<br />
-              {t.settings.pathHint2}
+              {t.settings.pathHint}
             </p>
           )}
           <p className="settings-current">{t.settings.currentPath}{dataPath}</p>

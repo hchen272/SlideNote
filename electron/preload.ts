@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Data path
   getDataPath: () => ipcRenderer.invoke('get-data-path'),
   setDataPath: (path: string) => ipcRenderer.invoke('set-data-path', path),
+  pickFolder: () => ipcRenderer.invoke('pick-folder'),
 
   // Themes
   getThemes: () => ipcRenderer.invoke('get-themes'),

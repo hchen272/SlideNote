@@ -129,6 +129,7 @@ C:\Users\<用户名>\AppData\Roaming\sticky-notes\config.json
 - [x] 设置面板自定义数据存储路径
 - [x] 基于 `electron-store` 的本地持久化
 - [x] 中文英文双语言版本
+- [x] 更方便的数据迁移
 
 ### 计划中
 
