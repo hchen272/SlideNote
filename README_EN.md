@@ -2,7 +2,7 @@
 
 > A desktop sticky-note app that stays on top, docks to the screen edge like a bookmark, and supports Markdown with themes.
 
-[中文文档](ChineseVersion.md)
+[中文文档](README_CN.md)
 
 > ⚠️ **This project is under active development.** A one-click installer (`.exe` setup) will be available soon. For now, see [Setup](#setup) to run from source.
 
@@ -65,7 +65,7 @@ npm run electron:dev
 |--------|-----|
 | **New note** | Click **+ New Note** in the sidebar |
 | **Edit / Preview** | Toggle 👁️ button in the toolbar |
-| **Switch theme** | Click the theme icon in the toolbar (🌆 Cyberpunk / 🌿 Nature / 🏰 Medieval) |
+| **Switch theme** | Click the theme icon in the toolbar (🌆 Nights / 🌿 Nature / 🏰 Medieval) |
 | **Dock to edge** | Click ◀ in the titlebar or press `Ctrl+Shift+D` |
 | **Expand from dock** | Click the colored tab at the screen edge |
 | **Move docked tab** | Drag the tab up/down along the edge |
@@ -128,10 +128,10 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - [x] Per-note font customization (size, weight, color)
 - [x] Custom data storage path via Settings panel
 - [x] Local persistence with `electron-store`
+- [x] Chinese / English bilingual support
 
 ### Up Next
 
-- [ ] Chinese / English bilingual support
 - [ ] Rich-text (non-Markdown) note editing
 - [ ] UI / visual improvements
 - [ ] Note tree structure
