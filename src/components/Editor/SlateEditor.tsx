@@ -20,6 +20,9 @@ type CodeBlockElement = { type: 'code-block'; children: Descendant[] }
 type LinkElement = { type: 'link'; url: string; children: CustomText[] }
 type InlineFormulaElement = { type: 'inline-formula'; formula: string; children: [{ text: '' }] }
 type BlockFormulaElement = { type: 'block-formula'; formula: string; children: [{ text: '' }] }
+type TableElement = { type: 'table'; children: TableRowElement[] }
+type TableRowElement = { type: 'table-row'; children: TableCellElement[] }
+type TableCellElement = { type: 'table-cell'; children: ParagraphElement[] }
 
 type CustomElement =
   | HeadingElement
@@ -33,6 +36,9 @@ type CustomElement =
   | LinkElement
   | InlineFormulaElement
   | BlockFormulaElement
+  | TableElement
+  | TableRowElement
+  | TableCellElement
 
 type CustomText = {
   text: string
@@ -173,6 +179,15 @@ function ElementRenderer({ attributes, children, element }: RenderElementProps) 
         </div>
       )
 
+    case 'table':
+      return <table {...attributes} className="slate-table"><tbody>{children}</tbody></table>
+
+    case 'table-row':
+      return <tr {...attributes} className="slate-table-row">{children}</tr>
+
+    case 'table-cell':
+      return <td {...attributes} className="slate-table-cell">{children}</td>
+
     default:
       return <p {...attributes} className="slate-paragraph">{children}</p>
   }
@@ -212,6 +227,14 @@ export function showFormPop(formula: string, el?: any) {
   formPop.open = true; formPop.formula = formula; formPop.element = el || null; notifyForm()
 }
 export function hideFormPop() { formPop.open = false; notifyForm() }
+
+// ---- Shared table popover state ----
+export const tablePop = { open: false, rows: 2, cols: 3 }
+let tableListener: (() => void) | null = null
+export function onTablePop(fn: () => void) { tableListener = fn }
+function notifyTable() { tableListener?.() }
+export function showTablePop() { tablePop.open = true; notifyTable() }
+export function hideTablePop() { tablePop.open = false; notifyTable() }
 
 // ---- Main Component ----
 interface SlateEditorProps {

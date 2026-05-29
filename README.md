@@ -29,11 +29,15 @@ Officially saying, Modern OS sticky-note tools have two fundamental flaws:
 - **Always on top** — stays visible above other windows (backs down for fullscreen apps)
 - **Edge docking** — collapses into a thin colored tab at the screen edge; drag to reposition
 - **3 themes** — Cyberpunk, Nature, Medieval
-- **Markdown editing** — write in Markdown with live preview
-- **TODO lists** — checkable checkboxes with strikethrough (`- [ ]` / `- [x]`)
+- **Markdown + Rich Text** — dual editing modes: Markdown with live preview, or Slate.js rich-text with Word-like toolbar
+- **TODO lists** — checkable checkboxes with strikethrough (both Markdown and rich-text)
+- **Links** — insert/edit links; Ctrl+Click to open in browser
+- **LaTeX formulas** — KaTeX rendering for inline `$...$` and block `$$...$$` formulas
+- **Tables** — insert tables with custom rows/cols; GFM table support in Markdown
 - **Note management** — create, delete, search, sort by creation time / modified time / word count
 - **Custom fonts** — adjustable font size, weight (bold/normal), and color per note
 - **Persistent storage** — all notes saved automatically; customizable storage path in Settings
+- **Bilingual** — Chinese / English UI, switchable in Settings
 
 ---
 
@@ -110,7 +114,9 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - **Electron** — desktop framework
 - **React 18** + **TypeScript** — UI
 - **Vite** — build tooling
+- **Slate.js** — rich-text editing
 - **marked** — Markdown rendering
+- **KaTeX** — LaTeX formula rendering
 - **electron-store** — local persistence
 
 ---
@@ -123,17 +129,19 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - [x] Edge-docking: collapse to a draggable colored tab, expand with a click
 - [x] 3 themes: Cyberpunk, Nature, Medieval
 - [x] Markdown editing with live preview
-- [x] TODO lists with checkable checkboxes (`- [ ]` / `- [x]`)
+- [x] Rich-text editing (Slate.js) with H1-H5 headings, inline marks
+- [x] TODO lists with checkable checkboxes
 - [x] Note management: create, delete, search, sort (by created / modified / word count)
 - [x] Per-note font customization (size, weight, color)
-- [x] Custom data storage path via Settings panel
+- [x] Custom data storage path via Settings panel with auto-migration
 - [x] Local persistence with `electron-store`
 - [x] Chinese / English bilingual support
-- [x] More convenient data migration
+- [x] Link support with Ctrl+Click to open in browser
+- [x] LaTeX formula support (KaTeX) — inline `$...$` and block `$$...$$`
+- [x] Table support — insert custom-size tables, GFM table converter
 
 ### Up Next
 
-- [ ] Rich-text (non-Markdown) note editing
 - [ ] UI / visual improvements
 - [ ] Note tree structure
 - [ ] More themes?

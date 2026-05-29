@@ -3,7 +3,7 @@ import { useSlate } from 'slate-react'
 import { Editor, Transforms, Element as SlateElement } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { useLang } from '../../i18n'
-import { editorRef, LIST_TYPES, linkPop, onLinkPop, showLinkPop, hideLinkPop, formPop, onFormPop, showFormPop, hideFormPop } from './SlateEditor'
+import { editorRef, LIST_TYPES, linkPop, onLinkPop, showLinkPop, hideLinkPop, formPop, onFormPop, showFormPop, hideFormPop, tablePop, onTablePop, showTablePop, hideTablePop } from './SlateEditor'
 
 const HEADINGS = [
   { level: 1, label: 'H1' },
@@ -42,6 +42,20 @@ function insertFormula(ed: Editor) {
   } else {
     Transforms.insertNodes(ed, { type: 'inline-formula', formula: formPop.formula.trim(), children: [{ text: '' }] } as any)
   }
+}
+
+function insertTable(ed: Editor, rows: number, cols: number) {
+  ReactEditor.focus(ed)
+  const tableRows = []
+  for (let r = 0; r < rows; r++) {
+    const cells = []
+    for (let c = 0; c < cols; c++) {
+      cells.push({ type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }] })
+    }
+    tableRows.push({ type: 'table-row', children: cells })
+  }
+  Transforms.insertNodes(ed, { type: 'table', children: tableRows } as any)
+  Transforms.insertNodes(ed, { type: 'paragraph', children: [{ text: '' }] } as any)
 }
 
 function isMarkActive(editor: Editor, format: string) {
@@ -115,6 +129,7 @@ export default function SlateToolbar() {
   useEffect(() => {
     onLinkPop(() => forceUpdate(n => n + 1))
     onFormPop(() => forceUpdate(n => n + 1))
+    onTablePop(() => forceUpdate(n => n + 1))
   }, [])
 
   useEffect(() => {
@@ -255,6 +270,26 @@ export default function SlateToolbar() {
               e.preventDefault(); e.stopPropagation()
               insertFormula(editorRef.current!)
               hideFormPop()
+            }}>✓</button>
+          </div>
+        )}
+        <button className="slate-toolbar-btn"
+          onMouseDown={e => { e.preventDefault(); showTablePop() }}
+          title="表格">
+          ⊞
+        </button>
+        {tablePop.open && (
+          <div className="slate-table-popover">
+            <label>行</label>
+            <input type="number" min={1} max={10} value={tablePop.rows}
+              onChange={e => { tablePop.rows = parseInt(e.target.value) || 2; forceUpdate(n => n + 1) }} />
+            <label>列</label>
+            <input type="number" min={1} max={10} value={tablePop.cols}
+              onChange={e => { tablePop.cols = parseInt(e.target.value) || 3; forceUpdate(n => n + 1) }} />
+            <button className="slate-link-ok" onMouseDown={e => {
+              e.preventDefault(); e.stopPropagation()
+              insertTable(editorRef.current!, tablePop.rows, tablePop.cols)
+              hideTablePop()
             }}>✓</button>
           </div>
         )}

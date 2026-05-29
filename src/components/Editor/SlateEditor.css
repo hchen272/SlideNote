@@ -217,3 +217,16 @@
 .slate-formula-popover { display: flex; align-items: center; gap: 4px; padding: 4px 6px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; z-index: 60; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
 .slate-formula-input { width: 200px; padding: 4px 8px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 3px; color: var(--text-primary); font-size: 12px; font-family: 'Consolas','Courier New',monospace; outline: none; }
 .slate-formula-input:focus { border-color: var(--accent-primary); }
+
+/* Table */
+.slate-table { width: 100%; border-collapse: collapse; margin: 8px 0; table-layout: fixed; }
+.slate-table-row { }
+.slate-table-cell { border: 1px solid var(--border-color); padding: 6px 10px; min-width: 60px; vertical-align: top; }
+.slate-table-cell:first-child { border-left: none; }
+.slate-table-cell:last-child { border-right: none; }
+
+/* Table popover */
+.slate-table-popover { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; z-index: 60; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+.slate-table-popover input { width: 40px; padding: 4px 6px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 3px; color: var(--text-primary); font-size: 12px; text-align: center; outline: none; font-family: var(--font-family); }
+.slate-table-popover input:focus { border-color: var(--accent-primary); }
+.slate-table-popover label { font-size: 11px; color: var(--text-secondary); font-family: var(--font-family); }

@@ -63,6 +63,16 @@ export function slateToMarkdown(nodes: Descendant[]): string {
       case 'block-formula':
         lines.push(`$$${node.formula}$$`)
         break
+      case 'table':
+        for (let ri = 0; ri < node.children.length; ri++) {
+          const row = node.children[ri]
+          const cells = row.children.map((c: any) => serializeChildren(c.children).trim())
+          lines.push('| ' + cells.join(' | ') + ' |')
+          if (ri === 0) {
+            lines.push('|' + cells.map(() => '---').join('|') + '|')
+          }
+        }
+        break
       default:
         if (node.children) {
           lines.push(serializeChildren(node.children))
@@ -261,6 +271,28 @@ export function markdownToSlate(md: string): Descendant[] {
         i++
       }
       nodes.push({ type: 'bulleted-list', children: listItems })
+      continue
+    }
+
+    // GFM table
+    const tableMatch = line.match(/^\|(.+)\|$/)
+    if (tableMatch) {
+      const rows: any[] = []
+      // Header row
+      const headers = tableMatch[1].split('|').map(c => c.trim())
+      rows.push({ type: 'table-row', children: headers.map(h => ({ type: 'table-cell', children: [{ type: 'paragraph', children: parseInlineMarks(h) }] })) })
+      i++
+      // Skip separator row if present
+      if (i < lines.length && /^\|[-:\s|]+\|$/.test(lines[i])) i++
+      // Data rows
+      while (i < lines.length) {
+        const dm = lines[i].match(/^\|(.+)\|$/)
+        if (!dm) break
+        const cells = dm[1].split('|').map(c => c.trim())
+        rows.push({ type: 'table-row', children: cells.map(c => ({ type: 'table-cell', children: [{ type: 'paragraph', children: parseInlineMarks(c) }] })) })
+        i++
+      }
+      nodes.push({ type: 'table', children: rows })
       continue
     }
 
