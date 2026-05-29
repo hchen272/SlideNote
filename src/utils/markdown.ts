@@ -4,7 +4,7 @@ import { marked } from 'marked'
 const renderer = new marked.Renderer()
 
 renderer.checkbox = function (checked: boolean) {
-  return `<input type="checkbox" class="md-checkbox" ${checked ? 'checked' : ''} disabled />`
+  return `<input type="checkbox" class="md-checkbox" ${checked ? 'checked' : ''} onclick="event.preventDefault()" />`
 }
 
 // Configure marked with extensions for task lists

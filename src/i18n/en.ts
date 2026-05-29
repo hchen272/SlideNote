@@ -21,6 +21,7 @@ const en: Translations = {
     sortModified: 'Modified',
     sortCreated: 'Created',
     sortWords: 'Word count',
+    sortTitle: 'Alphabetical',
     noNotes: 'No notes',
     untitled: 'Untitled',
     confirmDelete: 'Delete this note?',
@@ -72,6 +73,11 @@ const en: Translations = {
     quoteText: 'quote',
     codeText: 'code',
     linkText: 'link text',
+  },
+  outline: {
+    title: 'Outline',
+    empty: 'No headings\nUse # to add headings for outline',
+    toggleTooltip: 'Toggle outline panel',
   },
   welcome: {
     title: 'Welcome to Slide Note',

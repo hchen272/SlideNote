@@ -19,6 +19,7 @@ const zh = {
     sortModified: '修改时间',
     sortCreated: '创建时间',
     sortWords: '字数',
+    sortTitle: '首字母',
     noNotes: '暂无便签',
     untitled: '无标题',
     confirmDelete: '确定删除此便签？',
@@ -70,6 +71,11 @@ const zh = {
     quoteText: '引用文字',
     codeText: '代码',
     linkText: '链接文字',
+  },
+  outline: {
+    title: '大纲',
+    empty: '暂无标题\n使用 # 添加标题以生成大纲',
+    toggleTooltip: '切换大纲面板',
   },
   welcome: {
     title: '欢迎使用 Slide Note',

@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { ThemeProvider, useTheme } from './contexts/ThemeContext'
 import { NotesProvider, useNotes } from './contexts/NotesContext'
 import { LanguageProvider, useLang } from './i18n'
 import TitleBar from './components/TitleBar/TitleBar'
 import Sidebar from './components/Sidebar/Sidebar'
 import Editor from './components/Editor/Editor'
+import type { EditorHandle } from './components/Editor/Editor'
+import OutlinePanel from './components/Outline/OutlinePanel'
 import SettingsModal from './components/Settings/SettingsModal'
+import type { HeadingNode } from './types'
+import { extractMarkdownHeadings, extractSlateHeadings } from './utils/outline'
 
 function AppContent() {
   const { theme } = useTheme()
@@ -15,8 +19,24 @@ function AppContent() {
   const [isDocked, setIsDocked] = useState(false)
   const [dockedEdge, setDockedEdge] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [outlineOpen, setOutlineOpen] = useState(false)
+  const editorRef = useRef<EditorHandle>(null)
 
   const activeNote = notes.find(n => n.id === activeNoteId)
+
+  // Extract heading tree from active note (Markdown or Slate)
+  const headings: HeadingNode[] = useMemo(() => {
+    if (!activeNote) return []
+    if (activeNote.contentType === 'slate') {
+      return extractSlateHeadings(activeNote.slateContent || [])
+    }
+    return extractMarkdownHeadings(activeNote.content || '')
+  }, [activeNote?.content, activeNote?.slateContent])
+
+  // Jump to heading via Editor ref
+  const handleJumpToHeading = useCallback((heading: HeadingNode) => {
+    editorRef.current?.jumpToHeading(heading)
+  }, [])
 
   useEffect(() => {
     document.body.className = `theme-${theme}`
@@ -83,10 +103,19 @@ function AppContent() {
         activeNoteTitle={activeNote?.title || t.app.title}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         sidebarOpen={sidebarOpen}
+        onToggleOutline={() => setOutlineOpen(!outlineOpen)}
+        outlineOpen={outlineOpen}
       />
       <div className="app-body">
         <Sidebar isOpen={sidebarOpen} onOpenSettings={() => setSettingsOpen(true)} />
-        <Editor />
+        <Editor ref={editorRef} />
+        <OutlinePanel
+          headings={headings}
+          isOpen={outlineOpen}
+          onJump={handleJumpToHeading}
+          titleText={t.outline.title}
+          emptyText={t.outline.empty}
+        />
       </div>
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>

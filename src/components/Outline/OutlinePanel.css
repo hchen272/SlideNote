@@ -1,0 +1,190 @@
+.outline-panel {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  min-width: 160px;
+  height: 100%;
+  background: var(--sidebar-bg, var(--bg-secondary));
+  border-left: 1px solid var(--border-color);
+  font-family: var(--font-family);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ---- Header ---- */
+.outline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.outline-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.outline-count {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ---- Body (scrollable tree) ---- */
+.outline-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0;
+}
+
+.outline-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ---- Tree item ---- */
+.outline-tree-item {
+  user-select: none;
+}
+
+.outline-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-radius: 0 3px 3px 0;
+  margin-right: 6px;
+  min-height: 24px;
+}
+
+.outline-tree-row:hover {
+  background: var(--bg-hover);
+}
+
+.outline-tree-row:active {
+  background: var(--bg-tertiary);
+}
+
+/* ---- Expand/collapse toggle ---- */
+.outline-toggle {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color 0.15s;
+}
+
+.outline-toggle:hover {
+  color: var(--text-primary);
+}
+
+.outline-toggle.invisible {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---- Heading level badge ---- */
+.outline-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 16px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.outline-badge.lvl-1 {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.outline-badge.lvl-2 {
+  background: var(--accent-secondary);
+  color: var(--bg-primary);
+}
+
+.outline-badge.lvl-3 {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
+}
+
+.outline-badge.lvl-4,
+.outline-badge.lvl-5 {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+/* ---- Label ---- */
+.outline-label {
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* ---- Children container ---- */
+.outline-children {
+  /* smooth slide-in handled by parent state toggle */
+}
+
+/* ---- Panel resize handle ---- */
+.outline-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  z-index: 5;
+}
+
+.outline-resize-handle:hover,
+.outline-resize-handle:active {
+  background: var(--accent-primary);
+  opacity: 0.3;
+}
+
+/* ---- Scrollbar ---- */
+.outline-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.outline-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.outline-body::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.outline-body::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

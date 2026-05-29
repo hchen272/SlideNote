@@ -170,6 +170,8 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
           return b.modifiedAt - a.modifiedAt
         case 'wordCount':
           return b.wordCount - a.wordCount
+        case 'title':
+          return (a.title || '').localeCompare(b.title || '')
         default:
           return b.modifiedAt - a.modifiedAt
       }

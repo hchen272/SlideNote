@@ -8,9 +8,11 @@ interface TitleBarProps {
   activeNoteTitle: string
   onToggleSidebar: () => void
   sidebarOpen: boolean
+  onToggleOutline: () => void
+  outlineOpen: boolean
 }
 
-export default function TitleBar({ isDocked, activeNoteTitle, onToggleSidebar, sidebarOpen }: TitleBarProps) {
+export default function TitleBar({ isDocked, activeNoteTitle, onToggleSidebar, sidebarOpen, onToggleOutline, outlineOpen }: TitleBarProps) {
   const { theme } = useTheme()
   const { t } = useLang()
 
@@ -23,6 +25,13 @@ export default function TitleBar({ isDocked, activeNoteTitle, onToggleSidebar, s
           title={t.titlebar.toggleSidebar}
         >
           {sidebarOpen ? '◁' : '☰'}
+        </button>
+        <button
+          className="titlebar-btn outline-toggle"
+          onClick={onToggleOutline}
+          title={t.outline.toggleTooltip}
+        >
+          {outlineOpen ? '◁' : '☷'}
         </button>
         <button
           className="titlebar-btn dock-btn"

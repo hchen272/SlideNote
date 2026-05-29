@@ -1,3 +1,7 @@
 node_modules/
 dist-electron/
+dist/
+release/
 AGENTS.md
+.DS_Store
+Thumbs.db

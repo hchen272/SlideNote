@@ -140,11 +140,15 @@ C:\Users\<用户名>\AppData\Roaming\sticky-notes\config.json
 - [x] LaTeX 公式支持（KaTeX）— 行内 `$...$` 和块级 `$$...$$`
 - [x] 表格支持 — 自定义行列数插入，GFM 表格双向转换
 
+- [x] 修改config管理
+- [x] 笔记结构树
+
 ### 计划中
 
 - [ ] 可视化界面优化
-- [ ] 笔记结构树
 - [ ] 更多主题？
 - [ ] 与对应PPT关联 (灵感来源于ShareNote Engine 早期计划)
+- [ ] 笔记文件夹
+
 
 ---

@@ -1,16 +1,22 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react'
-import { Descendant } from 'slate'
+import React, { useState, useCallback, useRef, useMemo, forwardRef, useImperativeHandle } from 'react'
+import { Descendant, Editor as SlateEditorType, Transforms } from 'slate'
+import { ReactEditor } from 'slate-react'
 import katex from 'katex'
 import { useNotes } from '../../contexts/NotesContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useLang } from '../../i18n'
 import { renderMarkdown, toggleTodoInText } from '../../utils/markdown'
 import { slateToMarkdown, markdownToSlate } from '../../utils/slateMdConverter'
+import type { HeadingNode } from '../../types'
 import Toolbar from '../Toolbar/Toolbar'
-import SlateEditorComp from './SlateEditor'
+import SlateEditorComp, { editorRef as slateEditorRef } from './SlateEditor'
 import './Editor.css'
 
-export default function Editor() {
+export interface EditorHandle {
+  jumpToHeading: (heading: HeadingNode) => void
+}
+
+const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
   const { notes, activeNoteId, updateNote } = useNotes()
   const { theme } = useTheme()
   const { t } = useLang()
@@ -20,6 +26,9 @@ export default function Editor() {
   const activeNote = notes.find(n => n.id === activeNoteId)
   const isSlate = activeNote?.contentType === 'slate'
 
+  // Ref to suppress onChange during programmatic jumps (prevents double-update + re-render flicker)
+  const isJumpingRef = useRef(false)
+
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!activeNoteId) return
     updateNote(activeNoteId, { content: e.target.value })
@@ -27,6 +36,8 @@ export default function Editor() {
 
   const handleSlateChange = useCallback((value: Descendant[]) => {
     if (!activeNoteId) return
+    // Suppress onChange triggered by programmatic jump (focus+select fire onChange internally)
+    if (isJumpingRef.current) return
     updateNote(activeNoteId, { slateContent: value })
   }, [activeNoteId, updateNote])
 
@@ -34,6 +45,54 @@ export default function Editor() {
     if (!activeNoteId || !activeNote) return
     const newContent = toggleTodoInText(activeNote.content, lineIndex)
     updateNote(activeNoteId, { content: newContent })
+  }, [activeNoteId, activeNote, updateNote])
+
+  // Toggle TODO in edit mode when clicking the checkbox marker area of a todo line
+  const handleTextareaTodoClick = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
+    if (!activeNoteId || !activeNote) return
+    const textarea = e.currentTarget
+    const pos = textarea.selectionStart
+    const content = activeNote.content || ''
+    const lines = content.split('\n')
+
+    // Find the line where the cursor landed
+    let charCount = 0
+    let clickedLine = -1
+    for (let i = 0; i < lines.length; i++) {
+      charCount += lines[i].length + 1
+      if (pos < charCount) { clickedLine = i; break }
+    }
+    if (clickedLine < 0) return
+
+    // Column within the clicked line
+    let col = pos
+    for (let i = 0; i < clickedLine; i++) col -= lines[i].length + 1
+
+    const rawLine = lines[clickedLine]
+    // Locate checkbox marker `- [ ]` / `* [x]` in the line (may be indented)
+    const marker = rawLine.match(/[-*]\s*\[[ xX]\]/)
+    if (!marker || marker.index === undefined) return
+
+    // Only toggle if click is within the marker area
+    const mStart = marker.index
+    const mEnd = mStart + marker[0].length
+    if (col < mStart || col > mEnd) return
+
+    // Count todo items before this line
+    let todoIndex = 0
+    for (let i = 0; i < clickedLine; i++) {
+      const t = lines[i].trim()
+      if (t.startsWith('- [') || t.startsWith('* [')) todoIndex++
+    }
+
+    const newContent = toggleTodoInText(content, todoIndex)
+    updateNote(activeNoteId, { content: newContent })
+
+    // Restore cursor after React re-renders the textarea
+    setTimeout(() => {
+      textareaRef.current?.focus()
+      textareaRef.current?.setSelectionRange(pos, pos)
+    }, 0)
   }, [activeNoteId, activeNote, updateNote])
 
   const handleFontChange = useCallback((settings: { fontSize?: number; fontWeight?: 'normal' | 'bold'; fontColor?: string }) => {
@@ -93,6 +152,92 @@ export default function Editor() {
     return html
   }, [activeNote?.content])
 
+  // Expose jumpToHeading for the outline panel
+  useImperativeHandle(ref, () => ({
+    jumpToHeading: (heading: HeadingNode) => {
+      if (!activeNote) return
+
+      if (isSlate) {
+        // Slate: scroll to node by path
+        const ed = slateEditorRef.current as any
+        if (!ed || !heading.slatePath) return
+        try {
+          // Validate path still exists (content may have changed since headings were extracted)
+          if (!SlateEditorType.hasPath(ed, heading.slatePath)) return
+
+          const [node] = SlateEditorType.node(ed, heading.slatePath)
+          const domNode = ReactEditor.toDOMNode(ed, node)
+          if (domNode) {
+            domNode.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+
+          // Get a valid text-level point (Slate selection must target leaf text nodes, not block elements)
+          const startPoint = SlateEditorType.start(ed, heading.slatePath)
+
+          // Suppress onChange during programmatic focus+select to prevent
+          // unnecessary re-renders that can cause toolbar flicker/disappearance
+          isJumpingRef.current = true
+          try {
+            ReactEditor.focus(ed as any)
+            Transforms.select(ed as SlateEditorType, {
+              anchor: startPoint,
+              focus: startPoint,
+            })
+          } finally {
+            // Reset flag asynchronously so it covers any microtask-scheduled onChange
+            setTimeout(() => { isJumpingRef.current = false }, 0)
+          }
+        } catch { /* ignore selection errors */ }
+      } else {
+        // Markdown: jump to line in textarea or scroll preview
+        if (heading.lineIndex === undefined) return
+
+        if (previewMode) {
+          // Find the heading element in the preview DOM
+          const previewDiv = document.querySelector('.markdown-preview')
+          if (!previewDiv) return
+          const headings = previewDiv.querySelectorAll('h1, h2, h3, h4, h5')
+          // Count headings up to our lineIndex to find the right one
+          const lines = (activeNote.content || '').split('\n')
+          let headingCount = 0
+          let targetIdx = -1
+          for (let i = 0; i <= heading.lineIndex; i++) {
+            if (/^#{1,5}\s+/.test(lines[i])) {
+              if (i === heading.lineIndex) {
+                targetIdx = headingCount
+                break
+              }
+              headingCount++
+            }
+          }
+          if (targetIdx >= 0 && targetIdx < headings.length) {
+            headings[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        } else {
+          // Edit mode: place cursor at heading line in textarea
+          const textarea = textareaRef.current
+          if (!textarea) return
+
+          const lines = (activeNote.content || '').split('\n')
+          let charPos = 0
+          for (let i = 0; i < heading.lineIndex; i++) {
+            charPos += lines[i].length + 1 // +1 for newline
+          }
+          // Place cursor at start of heading text (after # markers)
+          const headingLine = lines[heading.lineIndex] || ''
+          const textStart = headingLine.match(/^#{1,5}\s+/)
+          const offset = textStart ? textStart[0].length : 0
+
+          textarea.focus()
+          textarea.setSelectionRange(charPos + offset, charPos + offset)
+          // Scroll the textarea to the right position
+          const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24
+          textarea.scrollTop = heading.lineIndex * lineHeight - 60
+        }
+      }
+    }
+  }), [activeNote, isSlate, previewMode, ref])
+
   if (!activeNote) {
     return <div className={`editor theme-${theme}`}><div className="editor-empty"><p>{t.editor.empty}</p></div></div>
   }
@@ -140,6 +285,7 @@ export default function Editor() {
           ) : (
             <textarea ref={textareaRef} className="editor-textarea" value={activeNote.content}
               onChange={handleContentChange} placeholder={t.editor.placeholder}
+              onMouseUp={handleTextareaTodoClick}
               style={{ fontSize: `${fontSettings.fontSize}px`, fontWeight: fontSettings.fontWeight, color: fontSettings.fontColor }}
               spellCheck={false}
             />
@@ -148,4 +294,6 @@ export default function Editor() {
       )}
     </div>
   )
-}
+})
+
+export default Editor

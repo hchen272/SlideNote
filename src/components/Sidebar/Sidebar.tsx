@@ -29,6 +29,7 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
     { value: 'modifiedAt', label: t.sidebar.sortModified },
     { value: 'createdAt', label: t.sidebar.sortCreated },
     { value: 'wordCount', label: t.sidebar.sortWords },
+    { value: 'title', label: t.sidebar.sortTitle },
   ]
 
   const formatDate = (timestamp: number) => {

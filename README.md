@@ -139,11 +139,12 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - [x] Link support with Ctrl+Click to open in browser
 - [x] LaTeX formula support (KaTeX) — inline `$...$` and block `$$...$$`
 - [x] Table support — insert custom-size tables, GFM table converter
+- [x] Note tree structure
+- [x] Modify config arrangement
 
 ### Up Next
 
 - [ ] UI / visual improvements
-- [ ] Note tree structure
 - [ ] More themes?
 - [ ] Associated to corresponding slides (Inspired by the early plans of ShareNote Engine)
 

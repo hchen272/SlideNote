@@ -1,5 +1,14 @@
 import type { Descendant } from 'slate'
 
+export interface HeadingNode {
+  level: number            // 1-5 heading level
+  text: string             // plain heading text (no markdown formatting)
+  lineIndex?: number       // line index in markdown source (0-based)
+  slatePath?: number[]     // slate node path in Descendant[]
+  children: HeadingNode[]  // sub-headings (e.g. h2 under h1)
+  id: string               // unique id for React key & scroll targeting
+}
+
 export interface Note {
   id: string
   title: string
@@ -20,7 +29,7 @@ export interface FontSettings {
 
 export type ThemeName = 'cyberpunk' | 'nature' | 'medieval'
 
-export type SortBy = 'createdAt' | 'modifiedAt' | 'wordCount'
+export type SortBy = 'createdAt' | 'modifiedAt' | 'wordCount' | 'title'
 
 export interface WeatherData {
   temperature: number

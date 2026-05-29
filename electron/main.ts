@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, screen, globalShortcut, dialog, shell } from 'electron'
 import { join } from 'path'
-import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync, readdirSync } from 'fs'
 import Store from 'electron-store'
 
 // ---- Custom data path support ----
@@ -21,8 +21,8 @@ function getDataPath(): string {
 function setDataPath(newPath: string): void {
   const oldPath = getDataPath()
 
-  // Read all current data from the in-memory store
-  const allKeys = ['windowBounds', 'isDocked', 'dockedEdge', 'theme', 'notes', 'settings', 'language', 'tabBounds', 'tabPosition']
+  // Read all current data from the in-memory store (non-notes config only)
+  const allKeys = ['windowBounds', 'isDocked', 'dockedEdge', 'theme', 'settings', 'language', 'tabBounds', 'tabPosition']
   const data: Record<string, any> = {}
   for (const key of allKeys) {
     data[key] = store.get(key)
@@ -42,6 +42,9 @@ function setDataPath(newPath: string): void {
     }
   }
 
+  // Migrate notes folder to new path
+  migrateNotesFolder(oldPath, newPath)
+
   // Delete old config file
   const oldConfig = join(oldPath, 'config.json')
   if (existsSync(oldConfig) && oldPath !== newPath) {
@@ -49,12 +52,102 @@ function setDataPath(newPath: string): void {
   }
 }
 
+// ---- Notes folder-based storage ----
+
+const NOTES_DIR = 'notes'
+
+function getNotesDir(): string {
+  return join(getDataPath(), NOTES_DIR)
+}
+
+/** Read all notes from individual JSON files in the notes/ folder */
+function readNotesFromDisk(): any[] {
+  const dir = getNotesDir()
+  if (!existsSync(dir)) return []
+  const notes: any[] = []
+  try {
+    const files = readdirSync(dir)
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue
+      try {
+        const data = JSON.parse(readFileSync(join(dir, file), 'utf-8'))
+        if (data && data.id) notes.push(data)
+      } catch { /* skip corrupted files */ }
+    }
+  } catch { /* ignore read errors */ }
+  return notes
+}
+
+/** Write all notes as individual JSON files, then clean orphan files */
+function writeNotesToDisk(notes: any[]): void {
+  const dir = getNotesDir()
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+
+  // Track which IDs we're writing
+  const writtenIds = new Set<string>()
+
+  for (const note of notes) {
+    if (!note.id) continue
+    writtenIds.add(note.id)
+    const filePath = join(dir, `${note.id}.json`)
+    writeFileSync(filePath, JSON.stringify(note, null, 2), 'utf-8')
+  }
+
+  // Remove orphan files (notes deleted from the array)
+  try {
+    const existingFiles = readdirSync(dir)
+    for (const file of existingFiles) {
+      if (!file.endsWith('.json')) continue
+      const id = file.replace('.json', '')
+      if (!writtenIds.has(id)) {
+        unlinkSync(join(dir, file))
+      }
+    }
+  } catch { /* ignore cleanup errors */ }
+}
+
+/** Migrate notes from old electron-store format to folder-based storage */
+function migrateNotesFromStore(): void {
+  const dir = getNotesDir()
+  // Only migrate if notes/ folder doesn't exist yet
+  if (existsSync(dir)) return
+
+  const oldNotes = store.get('notes', []) as any[]
+  if (!oldNotes || oldNotes.length === 0) return
+
+  try {
+    writeNotesToDisk(oldNotes)
+    // Delete the old notes key from store so it's not double-loaded
+    store.delete('notes' as any)
+    console.log(`Migrated ${oldNotes.length} notes to folder-based storage.`)
+  } catch (e) {
+    console.error('Failed to migrate notes:', e)
+  }
+}
+
+/** Copy notes folder from old data path to new data path */
+function migrateNotesFolder(oldPath: string, newPath: string): void {
+  const oldDir = join(oldPath, NOTES_DIR)
+  const newDir = join(newPath, NOTES_DIR)
+  if (!existsSync(oldDir)) return
+  if (!existsSync(newDir)) mkdirSync(newDir, { recursive: true })
+  try {
+    const files = readdirSync(oldDir)
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue
+      const src = join(oldDir, file)
+      const dst = join(newDir, file)
+      const data = readFileSync(src, 'utf-8')
+      writeFileSync(dst, data, 'utf-8')
+    }
+  } catch { /* ignore migration errors */ }
+}
+
 const storeDefaults = {
   windowBounds: { width: 380, height: 550, x: undefined, y: undefined },
   dockedEdge: null as 'left' | 'right' | null,
   isDocked: false,
   theme: 'cyberpunk',
-  notes: [],
   settings: {
     fontSize: 14,
     fontWeight: 'normal',
@@ -249,11 +342,11 @@ ipcMain.handle('set-store', (_event, key: string, value: any) => {
 })
 
 ipcMain.handle('get-notes', () => {
-  return store.get('notes', [])
+  return readNotesFromDisk()
 })
 
 ipcMain.handle('save-notes', (_event, notes: any[]) => {
-  store.set('notes', notes)
+  writeNotesToDisk(notes)
   return true
 })
 
@@ -347,6 +440,9 @@ ipcMain.on('stop-drag', () => {
 // ---- App Lifecycle ----
 
 app.whenReady().then(() => {
+  // Migrate old single-file notes to folder-based storage (one-time)
+  migrateNotesFromStore()
+
   createWindow()
 
   // Global shortcut: Ctrl+Shift+N to toggle dock
