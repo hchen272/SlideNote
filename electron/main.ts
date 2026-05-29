@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, globalShortcut, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, globalShortcut, dialog, shell } from 'electron'
 import { join } from 'path'
 import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs'
 import Store from 'electron-store'
@@ -303,6 +303,10 @@ ipcMain.handle('pick-folder', async () => {
     title: '选择数据存储文件夹',
   })
   return result.canceled ? null : result.filePaths[0]
+})
+
+ipcMain.handle('open-url', (_event, url: string) => {
+  shell.openExternal(url)
 })
 
 // ---- Window drag for docked tab ----

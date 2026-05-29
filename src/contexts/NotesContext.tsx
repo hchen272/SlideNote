@@ -7,7 +7,7 @@ interface NotesContextType {
   notes: Note[]
   activeNoteId: string | null
   setActiveNoteId: (id: string | null) => void
-  createNote: () => Promise<Note>
+  createNote: (contentType?: 'markdown' | 'slate') => Promise<Note>
   updateNote: (id: string, updates: Partial<Note>) => void
   deleteNote: (id: string) => void
   sortBy: SortBy
@@ -21,7 +21,7 @@ const NotesContext = createContext<NotesContextType>({
   notes: [],
   activeNoteId: null,
   setActiveNoteId: () => {},
-  createNote: async () => ({ id: '', title: '', content: '', createdAt: 0, modifiedAt: 0, wordCount: 0, fontSettings: { fontSize: 14, fontWeight: 'normal', fontColor: '#ffffff' } }),
+  createNote: async () => ({ id: '', title: '', content: '', slateContent: [], contentType: 'markdown' as const, createdAt: 0, modifiedAt: 0, wordCount: 0, fontSettings: { fontSize: 14, fontWeight: 'normal' as const, fontColor: '#ffffff' } }),
   updateNote: () => {},
   deleteNote: () => {},
   sortBy: 'modifiedAt',
@@ -47,8 +47,14 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     if (window.electronAPI) {
       window.electronAPI.getNotes().then((saved: Note[]) => {
         if (saved && saved.length > 0) {
-          setNotes(saved)
-          setActiveNoteId(saved[0].id)
+          // Migrate old notes missing new fields
+          const migrated = saved.map(n => ({
+            ...n,
+            slateContent: n.slateContent || [{ type: 'paragraph' as const, children: [{ text: '' }] }],
+            contentType: n.contentType || 'markdown',
+          }))
+          setNotes(migrated)
+          setActiveNoteId(migrated[0].id)
         } else {
           // Load language to pick correct welcome note
           window.electronAPI?.getStore('language').then((lang: string) => {
@@ -57,6 +63,8 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
               id: generateId(),
               title: t.welcome.title,
               content: t.welcome.content,
+              slateContent: [{ type: 'paragraph' as const, children: [{ text: '' }] }],
+              contentType: 'markdown',
               createdAt: Date.now(),
               modifiedAt: Date.now(),
               wordCount: 0,
@@ -85,11 +93,13 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   // Create a new note
-  const createNote = useCallback(async (): Promise<Note> => {
+  const createNote = useCallback(async (contentType: 'markdown' | 'slate' = 'markdown'): Promise<Note> => {
     const newNote: Note = {
       id: generateId(),
-      title: '新建便签',
+      title: contentType === 'slate' ? '新建富文本' : '新建便签',
       content: '',
+      slateContent: [{ type: 'paragraph' as const, children: [{ text: '' }] }],
+      contentType,
       createdAt: Date.now(),
       modifiedAt: Date.now(),
       wordCount: 0,

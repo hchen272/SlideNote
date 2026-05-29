@@ -26,6 +26,7 @@ const en: Translations = {
     confirmDelete: 'Delete this note?',
     needOneNote: 'Keep at least one note',
     settings: 'Settings',
+    richText: 'Rich Text',
   },
   editor: {
     placeholder: 'Start writing... Markdown supported',

@@ -24,6 +24,7 @@ const zh = {
     confirmDelete: '确定删除此便签？',
     needOneNote: '至少保留一个便签',
     settings: '设置',
+    richText: '富文本',
   },
   editor: {
     placeholder: '开始写作... 支持 Markdown 格式',

@@ -13,11 +13,16 @@
   },
   "dependencies": {
     "electron-store": "^8.1.0",
+    "katex": "^0.17.0",
     "marked": "^12.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "slate": "^0.124.1",
+    "slate-history": "^0.113.1",
+    "slate-react": "^0.124.2"
   },
   "devDependencies": {
+    "@types/katex": "^0.16.8",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",

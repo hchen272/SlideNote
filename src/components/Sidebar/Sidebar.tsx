@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useNotes } from '../../contexts/NotesContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useLang } from '../../i18n'
@@ -23,7 +23,7 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
     setSearchQuery,
   } = useNotes()
   const { theme } = useTheme()
-  const { t } = useLang()
+  const { t, lang } = useLang()
 
   const sortOptions: { value: SortBy; label: string }[] = [
     { value: 'modifiedAt', label: t.sidebar.sortModified },
@@ -47,12 +47,37 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
 
   if (!isOpen) return null
 
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
   return (
     <div className={`sidebar theme-${theme}`}>
       <div className="sidebar-header">
-        <button className="new-note-btn" onClick={createNote}>
-          {t.sidebar.newNote}
-        </button>
+        <div className="new-note-dropdown" ref={menuRef}>
+          <button className="new-note-btn" onClick={() => setMenuOpen(!menuOpen)}>
+            {t.sidebar.newNote}
+          </button>
+          {menuOpen && (
+            <div className="new-note-menu">
+              <button className="new-note-menu-item" onClick={() => { createNote('markdown'); setMenuOpen(false) }}>
+                📄 Markdown
+              </button>
+              <button className="new-note-menu-item" onClick={() => { createNote('slate'); setMenuOpen(false) }}>
+                ✨ {t.sidebar.richText || '富文本'}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="sidebar-search">
@@ -97,7 +122,7 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
             </div>
             <div className="note-item-meta">
               <span>{formatDate(note.modifiedAt)}</span>
-              <span>{note.wordCount}{t.lang === 'zh' ? '字' : 'w'}</span>
+              <span>{note.wordCount}{lang === 'zh' ? '字' : 'w'}</span>
             </div>
           </div>
         ))}

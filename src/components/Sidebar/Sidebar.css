@@ -14,9 +14,13 @@
   border-bottom: 1px solid var(--divider);
 }
 
+.new-note-dropdown {
+  position: relative;
+}
+
 .new-note-btn {
   width: 100%;
-  padding: 8px 16px;
+  padding: 8px 14px;
   background: var(--button-primary);
   color: var(--bg-primary);
   border: none;
@@ -30,7 +34,42 @@
 
 .new-note-btn:hover {
   background: var(--button-hover);
-  transform: translateY(-1px);
+}
+
+.new-note-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 50;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.new-note-menu-item {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.new-note-menu-item:hover {
+  background: var(--bg-hover);
+  color: var(--accent-primary);
+}
+
+.new-note-menu-item + .new-note-menu-item {
+  border-top: 1px solid var(--divider);
 }
 
 .sidebar-search {

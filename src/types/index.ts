@@ -1,7 +1,11 @@
+import type { Descendant } from 'slate'
+
 export interface Note {
   id: string
   title: string
-  content: string
+  content: string          // markdown content (when contentType is 'markdown')
+  slateContent: Descendant[] // slate JSON content (when contentType is 'slate')
+  contentType: 'markdown' | 'slate'
   createdAt: number
   modifiedAt: number
   wordCount: number
@@ -51,6 +55,7 @@ export interface ElectronAPI {
   getDataPath: () => Promise<string>
   setDataPath: (path: string) => Promise<boolean>
   pickFolder: () => Promise<string | null>
+  openUrl: (url: string) => Promise<void>
   getThemes: () => Promise<string[]>
 }
 

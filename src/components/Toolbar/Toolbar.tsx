@@ -14,19 +14,33 @@ interface ToolbarProps {
     fontColor: string
   }
   onFontChange: (settings: { fontSize?: number; fontWeight?: 'normal' | 'bold'; fontColor?: string }) => void
+  isSlate?: boolean
+  onConvert?: () => void
 }
 
 const COLORS = ['#ffffff', '#e0e0ff', '#00ff88', '#ffcc00', '#ff6b6b', '#7ddf90', '#daa520', '#ff69b4', '#87ceeb']
 
-export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown, fontSettings, onFontChange }: ToolbarProps) {
+export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown, fontSettings, onFontChange, isSlate, onConvert }: ToolbarProps) {
   const { theme } = useTheme()
   const { t } = useLang()
 
   return (
     <div className={`toolbar theme-${theme}`}>
       <div className="toolbar-section">
-        <button
-          className={`toolbar-btn ${previewMode ? 'active' : ''}`}
+        {onConvert && (
+          <>
+            <button className="toolbar-btn" onClick={onConvert}
+              title={isSlate ? '转为 Markdown' : '转为富文本'}>
+              {isSlate ? 'MD' : '📝'}
+            </button>
+            <div className="toolbar-divider" />
+          </>
+        )}
+
+        {!isSlate && (
+          <>
+            <button
+              className={`toolbar-btn ${previewMode ? 'active' : ''}`}
           onClick={onTogglePreview}
           title={previewMode ? t.editor.edit : t.editor.preview}
         >
@@ -45,6 +59,8 @@ export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown
         <button className="toolbar-btn" onClick={() => onInsertMarkdown('todo')} title={t.toolbar.todo}>☑</button>
         <button className="toolbar-btn" onClick={() => onInsertMarkdown('quote')} title={t.toolbar.quote}>❝</button>
         <button className="toolbar-btn" onClick={() => onInsertMarkdown('link')} title={t.toolbar.link}>🔗</button>
+          </>
+        )}
       </div>
 
       <div className="toolbar-section">
