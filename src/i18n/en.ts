@@ -83,19 +83,40 @@ const en: Translations = {
     title: 'Welcome to Slide Note',
     content: `# Welcome to Slide Note! 🎉
 
-## Features
+Slide Note is an always-on-top desktop sticky-note app with Markdown and rich-text editing.
 
-- **Markdown** rendering
-- Checkable TODO lists
-- Multiple themes
+## ✨ Core Features
 
-## TODO Example
+- **📝 Dual Editing** — Markdown source / Slate rich text, one-click conversion
+- **☑ TODO Lists** — Use \`- [ ]\` to create tasks, click checkbox to toggle
+- **🎨 Three Themes** — Cyberpunk / Nature / Medieval, switch via gear icon
+- **📋 Outline Panel** — Click ☷ in the titlebar to open heading tree navigation
+- **📌 Screen Docking** — Drag to screen edge to dock, click to expand
 
-- [x] Project initialized
-- [ ] Learn Markdown syntax
-- [ ] Try switching themes
+## ⌨ Quick Actions
 
-> Slide Note — take notes while viewing slides
+| Action | How |
+|--------|-----|
+| New note | Sidebar + button |
+| Search notes | Sidebar search box |
+| Sort notes | Sidebar dropdown (date/words/alphabetical) |
+| Switch theme | Toolbar rightmost dropdown |
+| Dock / Expand | \`Ctrl+Shift+D\` or titlebar ◀ button |
+| Toggle outline | Titlebar ☷ button |
+| Md ↔ Rich Text | Toolbar MD / 📝 button |
+| Font / Color | Toolbar right-side dropdown & swatches |
+
+## 📂 Data Storage
+
+Each note is stored as an individual JSON file (\`data-path/notes/<id>.json\`), making backups, Git tracking, and migration easy.
+
+> 💡 Tip: You can customize the data storage path in Settings.
+
+## 🔗 Project Link
+
+[GitHub Link](https://github.com/hchen272/SlideNote)
+
+---
 
 Enjoy!`,
   },

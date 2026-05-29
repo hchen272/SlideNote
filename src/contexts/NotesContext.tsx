@@ -56,28 +56,31 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
           setNotes(migrated)
           setActiveNoteId(migrated[0].id)
         } else {
-          // Load language to pick correct welcome note
+          // Create both language welcome notes
           window.electronAPI?.getStore('language').then((lang: string) => {
-            const t = lang === 'en' ? en : zh
-            const defaultNote: Note = {
+            const makeNote = (title: string, content: string): Note => ({
               id: generateId(),
-              title: t.welcome.title,
-              content: t.welcome.content,
+              title,
+              content,
               slateContent: [{ type: 'paragraph' as const, children: [{ text: '' }] }],
               contentType: 'markdown',
               createdAt: Date.now(),
               modifiedAt: Date.now(),
-              wordCount: 0,
+              wordCount: content.length,
               fontSettings: {
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontColor: '#ffffff',
               },
-            }
-            defaultNote.wordCount = defaultNote.content.length
-            setNotes([defaultNote])
-            setActiveNoteId(defaultNote.id)
-            saveNotesToDisk([defaultNote])
+            })
+
+            const zhNote = makeNote(zh.welcome.title, zh.welcome.content)
+            const enNote = makeNote(en.welcome.title, en.welcome.content)
+            const welcomeNotes = [zhNote, enNote]
+
+            setNotes(welcomeNotes)
+            setActiveNoteId(lang === 'en' ? enNote.id : zhNote.id)
+            saveNotesToDisk(welcomeNotes)
           })
         }
         setLoaded(true)

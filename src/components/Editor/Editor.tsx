@@ -29,6 +29,10 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
   // Ref to suppress onChange during programmatic jumps (prevents double-update + re-render flicker)
   const isJumpingRef = useRef(false)
 
+  // Slate fires onChange with initialValue on mount; suppress this
+  // first call to prevent overwriting persisted content (e.g. after dock→undock)
+  const isSlateInitRef = useRef(true)
+
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!activeNoteId) return
     updateNote(activeNoteId, { content: e.target.value })
@@ -38,6 +42,8 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
     if (!activeNoteId) return
     // Suppress onChange triggered by programmatic jump (focus+select fire onChange internally)
     if (isJumpingRef.current) return
+    // Suppress initial mount onChange (Slate fires this with initialValue)
+    if (isSlateInitRef.current) { isSlateInitRef.current = false; return }
     updateNote(activeNoteId, { slateContent: value })
   }, [activeNoteId, updateNote])
 
