@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from './contexts/ThemeContext'
 import { NotesProvider, useNotes } from './contexts/NotesContext'
+import { LanguageProvider, useLang } from './i18n'
 import TitleBar from './components/TitleBar/TitleBar'
 import Sidebar from './components/Sidebar/Sidebar'
 import Editor from './components/Editor/Editor'
@@ -8,6 +9,7 @@ import SettingsModal from './components/Settings/SettingsModal'
 
 function AppContent() {
   const { theme } = useTheme()
+  const { t } = useLang()
   const { notes, activeNoteId } = useNotes()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isDocked, setIsDocked] = useState(false)
@@ -16,20 +18,16 @@ function AppContent() {
 
   const activeNote = notes.find(n => n.id === activeNoteId)
 
-  // Sync theme class to body so CSS variables affect the entire window
   useEffect(() => {
     document.body.className = `theme-${theme}`
   }, [theme])
 
   useEffect(() => {
-    // Get initial dock state
     if (window.electronAPI) {
       window.electronAPI.getDockState().then(state => {
         setIsDocked(state.isDocked)
         setDockedEdge(state.dockedEdge)
       })
-
-      // Listen for dock state changes
       window.electronAPI.onDockStateChanged((state) => {
         setIsDocked(state.isDocked)
         setDockedEdge(state.dockedEdge)
@@ -37,12 +35,10 @@ function AppContent() {
     }
   }, [])
 
-  // When docked: click to expand, drag to move along edge
   if (isDocked) {
     const handlePointerDown = (e: React.PointerEvent) => {
       const el = e.currentTarget as HTMLElement
       el.setPointerCapture(e.pointerId)
-
       const startX = e.screenX
       const startY = e.screenY
       let dragged = false
@@ -73,7 +69,7 @@ function AppContent() {
       <div
         className={`app-container docked ${dockedEdge} theme-${theme}`}
         onPointerDown={handlePointerDown}
-        title="点击展开 / 拖拽移动"
+        title={t.app.dockedTooltip}
       >
         <div className="dock-tab-strip" />
       </div>
@@ -84,7 +80,7 @@ function AppContent() {
     <div className={`app-container theme-${theme}`}>
       <TitleBar
         isDocked={isDocked}
-        activeNoteTitle={activeNote?.title || 'Sticky Notes'}
+        activeNoteTitle={activeNote?.title || t.app.title}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         sidebarOpen={sidebarOpen}
       />
@@ -99,10 +95,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <NotesProvider>
-        <AppContent />
-      </NotesProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <NotesProvider>
+          <AppContent />
+        </NotesProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   )
 }

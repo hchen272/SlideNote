@@ -2,7 +2,7 @@
 
 > A desktop sticky-note app that stays on top, docks to the screen edge like a bookmark, and supports Markdown with themes.
 
-[中文](ChineseVersion.md)
+[中文文档](ChineseVersion.md)
 
 > ⚠️ **This project is under active development.** A one-click installer (`.exe` setup) will be available soon. For now, see [Setup](#setup) to run from source.
 

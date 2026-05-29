@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useLang } from '../../i18n'
 import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher'
 import './Toolbar.css'
 
@@ -19,6 +20,7 @@ const COLORS = ['#ffffff', '#e0e0ff', '#00ff88', '#ffcc00', '#ff6b6b', '#7ddf90'
 
 export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown, fontSettings, onFontChange }: ToolbarProps) {
   const { theme } = useTheme()
+  const { t } = useLang()
 
   return (
     <div className={`toolbar theme-${theme}`}>
@@ -26,23 +28,23 @@ export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown
         <button
           className={`toolbar-btn ${previewMode ? 'active' : ''}`}
           onClick={onTogglePreview}
-          title={previewMode ? '切换到编辑' : '预览 Markdown'}
+          title={previewMode ? t.editor.edit : t.editor.preview}
         >
           {previewMode ? '✏️' : '👁️'}
         </button>
         <div className="toolbar-divider" />
 
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('heading')} title="标题">H</button>
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('bold')} title="粗体"><b>B</b></button>
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('italic')} title="斜体"><i>I</i></button>
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('code')} title="代码">{'<>'}</button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('heading')} title={t.toolbar.heading}>H</button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('bold')} title={t.toolbar.bold}><b>B</b></button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('italic')} title={t.toolbar.italic}><i>I</i></button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('code')} title={t.toolbar.code}>{'<>'}</button>
 
         <div className="toolbar-divider" />
 
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('list')} title="列表">•≡</button>
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('todo')} title="待办事项">☑</button>
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('quote')} title="引用">❝</button>
-        <button className="toolbar-btn" onClick={() => onInsertMarkdown('link')} title="链接">🔗</button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('list')} title={t.toolbar.list}>•≡</button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('todo')} title={t.toolbar.todo}>☑</button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('quote')} title={t.toolbar.quote}>❝</button>
+        <button className="toolbar-btn" onClick={() => onInsertMarkdown('link')} title={t.toolbar.link}>🔗</button>
       </div>
 
       <div className="toolbar-section">
@@ -52,7 +54,7 @@ export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown
           className="font-size-select"
           value={fontSettings.fontSize}
           onChange={(e) => onFontChange({ fontSize: parseInt(e.target.value) })}
-          title="字体大小"
+          title={t.toolbar.fontSize}
         >
           {[10, 12, 14, 16, 18, 20, 24, 28].map(size => (
             <option key={size} value={size}>{size}px</option>
@@ -62,7 +64,7 @@ export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown
         <button
           className={`toolbar-btn ${fontSettings.fontWeight === 'bold' ? 'active' : ''}`}
           onClick={() => onFontChange({ fontWeight: fontSettings.fontWeight === 'bold' ? 'normal' : 'bold' })}
-          title="加粗"
+          title={t.toolbar.fontBold}
         >
           <b>B</b>
         </button>
@@ -70,7 +72,7 @@ export default function Toolbar({ previewMode, onTogglePreview, onInsertMarkdown
         <div className="color-picker-wrapper">
           <button
             className="toolbar-btn color-btn"
-            title="字体颜色"
+            title={t.toolbar.fontColor}
             style={{ color: fontSettings.fontColor }}
           >
             A

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { Note, SortBy } from '../types'
+import zh from '../i18n/zh'
+import en from '../i18n/en'
 
 interface NotesContextType {
   notes: Note[]
@@ -48,41 +50,27 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
           setNotes(saved)
           setActiveNoteId(saved[0].id)
         } else {
-          // Create a default welcome note
-          const defaultNote: Note = {
-            id: generateId(),
-            title: '欢迎使用便签',
-            content: `# 欢迎使用 Sticky Notes! 🎉
-
-## 功能特点
-
-- **Markdown** 渲染支持
-- 可以勾选的 TODO 列表
-- 多种主题可选
-- 天气信息显示
-
-## TODO 示例
-
-- [x] 完成项目初始化
-- [ ] 学习 Markdown 语法
-- [ ] 尝试切换主题
-
-> 这是一条引用文字
-
-祝你使用愉快！`,
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-            wordCount: 0,
-            fontSettings: {
-              fontSize: 14,
-              fontWeight: 'normal',
-              fontColor: '#ffffff',
-            },
-          }
-          defaultNote.wordCount = defaultNote.content.length
-          setNotes([defaultNote])
-          setActiveNoteId(defaultNote.id)
-          saveNotesToDisk([defaultNote])
+          // Load language to pick correct welcome note
+          window.electronAPI?.getStore('language').then((lang: string) => {
+            const t = lang === 'en' ? en : zh
+            const defaultNote: Note = {
+              id: generateId(),
+              title: t.welcome.title,
+              content: t.welcome.content,
+              createdAt: Date.now(),
+              modifiedAt: Date.now(),
+              wordCount: 0,
+              fontSettings: {
+                fontSize: 14,
+                fontWeight: 'normal',
+                fontColor: '#ffffff',
+              },
+            }
+            defaultNote.wordCount = defaultNote.content.length
+            setNotes([defaultNote])
+            setActiveNoteId(defaultNote.id)
+            saveNotesToDisk([defaultNote])
+          })
         }
         setLoaded(true)
       })

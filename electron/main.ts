@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import Store from 'electron-store'
 
 // ---- Custom data path support ----
-const configPath = join(app.getPath('userData'), 'sticky-notes-path.json')
+const configPath = join(app.getPath('userData'), 'slide-note-path.json')
 
 function getDataPath(): string {
   try {

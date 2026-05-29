@@ -1,7 +1,7 @@
 {
-  "name": "sticky-notes",
+  "name": "slide-note",
   "version": "1.0.0",
-  "description": "A feature-rich sticky note application with themes, markdown, and weather",
+  "description": "A desktop note app that stays on top and docks to screen edges",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -32,7 +32,7 @@
   },
   "build": {
     "appId": "com.stickynotes.app",
-    "productName": "Sticky Notes",
+    "productName": "Slide Note",
     "files": [
       "dist/**/*",
       "dist-electron/**/*"

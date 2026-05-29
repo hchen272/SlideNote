@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNotes } from '../../contexts/NotesContext'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useLang } from '../../i18n'
 import type { SortBy } from '../../types'
 import './Sidebar.css'
 
@@ -22,11 +23,12 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
     setSearchQuery,
   } = useNotes()
   const { theme } = useTheme()
+  const { t } = useLang()
 
   const sortOptions: { value: SortBy; label: string }[] = [
-    { value: 'modifiedAt', label: '修改时间' },
-    { value: 'createdAt', label: '创建时间' },
-    { value: 'wordCount', label: '字数' },
+    { value: 'modifiedAt', label: t.sidebar.sortModified },
+    { value: 'createdAt', label: t.sidebar.sortCreated },
+    { value: 'wordCount', label: t.sidebar.sortWords },
   ]
 
   const formatDate = (timestamp: number) => {
@@ -36,10 +38,10 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
-    if (sortedNotes.length > 1 && confirm('确定删除此便签？')) {
+    if (sortedNotes.length > 1 && confirm(t.sidebar.confirmDelete)) {
       deleteNote(id)
     } else if (sortedNotes.length <= 1) {
-      alert('至少保留一个便签')
+      alert(t.sidebar.needOneNote)
     }
   }
 
@@ -49,14 +51,14 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
     <div className={`sidebar theme-${theme}`}>
       <div className="sidebar-header">
         <button className="new-note-btn" onClick={createNote}>
-          + 新建便签
+          {t.sidebar.newNote}
         </button>
       </div>
 
       <div className="sidebar-search">
         <input
           type="text"
-          placeholder="搜索便签..."
+          placeholder={t.sidebar.searchPlaceholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
@@ -64,7 +66,7 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
       </div>
 
       <div className="sidebar-sort">
-        <span className="sort-label">排序：</span>
+        <span className="sort-label">{t.sidebar.sortLabel}</span>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortBy)}
@@ -84,28 +86,28 @@ export default function Sidebar({ isOpen, onOpenSettings }: SidebarProps) {
             onClick={() => setActiveNoteId(note.id)}
           >
             <div className="note-item-header">
-              <span className="note-item-title">{note.title || '无标题'}</span>
+              <span className="note-item-title">{note.title || t.sidebar.untitled}</span>
               <button
                 className="note-item-delete"
                 onClick={(e) => handleDelete(e, note.id)}
-                title="删除"
+                title={t.sidebar.settings}
               >
                 ×
               </button>
             </div>
             <div className="note-item-meta">
               <span>{formatDate(note.modifiedAt)}</span>
-              <span>{note.wordCount}字</span>
+              <span>{note.wordCount}{t.lang === 'zh' ? '字' : 'w'}</span>
             </div>
           </div>
         ))}
         {sortedNotes.length === 0 && (
-          <div className="no-notes">暂无便签</div>
+          <div className="no-notes">{t.sidebar.noNotes}</div>
         )}
       </div>
 
       <div className="sidebar-footer">
-        <button className="sidebar-settings-btn" onClick={onOpenSettings} title="设置">
+        <button className="sidebar-settings-btn" onClick={onOpenSettings} title={t.sidebar.settings}>
           ⚙
         </button>
       </div>

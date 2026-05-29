@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { useNotes } from '../../contexts/NotesContext'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useLang } from '../../i18n'
 import { renderMarkdown, extractTodoStats, toggleTodoInText } from '../../utils/markdown'
 import Toolbar from '../Toolbar/Toolbar'
 import './Editor.css'
@@ -8,6 +9,7 @@ import './Editor.css'
 export default function Editor() {
   const { notes, activeNoteId, updateNote } = useNotes()
   const { theme } = useTheme()
+  const { t } = useLang()
   const [previewMode, setPreviewMode] = useState(false)
   const [todoStats, setTodoStats] = useState({ total: 0, completed: 0 })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -54,35 +56,35 @@ export default function Editor() {
 
     switch (syntax) {
       case 'bold':
-        newText = text.substring(0, start) + `**${selected || '粗体文字'}**` + text.substring(end)
+        newText = text.substring(0, start) + `**${selected || t.insert.boldText}**` + text.substring(end)
         cursorOffset = selected ? 0 : -2
         break
       case 'italic':
-        newText = text.substring(0, start) + `*${selected || '斜体文字'}*` + text.substring(end)
+        newText = text.substring(0, start) + `*${selected || t.insert.italicText}*` + text.substring(end)
         cursorOffset = selected ? 0 : -1
         break
       case 'heading':
-        newText = text.substring(0, start) + `\n## ${selected || '标题'}\n` + text.substring(end)
+        newText = text.substring(0, start) + `\n## ${selected || t.insert.headingText}\n` + text.substring(end)
         cursorOffset = 0
         break
       case 'list':
-        newText = text.substring(0, start) + `\n- ${selected || '列表项'}\n` + text.substring(end)
+        newText = text.substring(0, start) + `\n- ${selected || t.insert.listItem}\n` + text.substring(end)
         cursorOffset = 0
         break
       case 'todo':
-        newText = text.substring(0, start) + `\n- [ ] ${selected || '待办事项'}\n` + text.substring(end)
+        newText = text.substring(0, start) + `\n- [ ] ${selected || t.insert.todoItem}\n` + text.substring(end)
         cursorOffset = 0
         break
       case 'quote':
-        newText = text.substring(0, start) + `\n> ${selected || '引用文字'}\n` + text.substring(end)
+        newText = text.substring(0, start) + `\n> ${selected || t.insert.quoteText}\n` + text.substring(end)
         cursorOffset = 0
         break
       case 'code':
-        newText = text.substring(0, start) + `\`${selected || '代码'}\`` + text.substring(end)
+        newText = text.substring(0, start) + `\`${selected || t.insert.codeText}\`` + text.substring(end)
         cursorOffset = selected ? 0 : -1
         break
       case 'link':
-        newText = text.substring(0, start) + `[${selected || '链接文字'}](url)` + text.substring(end)
+        newText = text.substring(0, start) + `[${selected || t.insert.linkText}](url)` + text.substring(end)
         cursorOffset = selected ? -4 : -4
         break
       default:
@@ -101,7 +103,7 @@ export default function Editor() {
     return (
       <div className={`editor theme-${theme}`}>
         <div className="editor-empty">
-          <p>选择一个便签或创建新的便签</p>
+          <p>{t.editor.empty}</p>
         </div>
       </div>
     )
@@ -146,7 +148,7 @@ export default function Editor() {
             className="editor-textarea"
             value={activeNote.content}
             onChange={handleContentChange}
-            placeholder="开始写作... 支持 Markdown 格式"
+            placeholder={t.editor.placeholder}
             style={{
               fontSize: `${fontSettings.fontSize}px`,
               fontWeight: fontSettings.fontWeight,

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useLang } from '../../i18n'
 import './TitleBar.css'
 
 interface TitleBarProps {
@@ -11,22 +12,7 @@ interface TitleBarProps {
 
 export default function TitleBar({ isDocked, activeNoteTitle, onToggleSidebar, sidebarOpen }: TitleBarProps) {
   const { theme } = useTheme()
-
-  const handleMinimize = () => {
-    window.electronAPI?.minimizeWindow()
-  }
-
-  const handleMaximize = () => {
-    window.electronAPI?.maximizeWindow()
-  }
-
-  const handleClose = () => {
-    window.electronAPI?.closeWindow()
-  }
-
-  const handleDock = () => {
-    window.electronAPI?.toggleDock()
-  }
+  const { t } = useLang()
 
   return (
     <div className={`titlebar theme-${theme}`}>
@@ -34,31 +20,31 @@ export default function TitleBar({ isDocked, activeNoteTitle, onToggleSidebar, s
         <button
           className="titlebar-btn sidebar-toggle"
           onClick={onToggleSidebar}
-          title={sidebarOpen ? '关闭侧边栏' : '打开侧边栏'}
+          title={t.titlebar.toggleSidebar}
         >
           {sidebarOpen ? '◁' : '☰'}
         </button>
         <button
           className="titlebar-btn dock-btn"
-          onClick={handleDock}
-          title={isDocked ? '展开窗口' : '吸附到边栏'}
+          onClick={() => window.electronAPI?.toggleDock()}
+          title={isDocked ? t.titlebar.undock : t.titlebar.dock}
         >
           {isDocked ? '▶' : '◀'}
         </button>
       </div>
 
       <div className="titlebar-center">
-        <span className="titlebar-title">{activeNoteTitle || 'Sticky Notes'}</span>
+        <span className="titlebar-title">{activeNoteTitle || t.app.title}</span>
       </div>
 
       <div className="titlebar-right">
-        <button className="titlebar-btn min-btn" onClick={handleMinimize} title="最小化">
+        <button className="titlebar-btn min-btn" onClick={() => window.electronAPI?.minimizeWindow()} title={t.titlebar.minimize}>
           ─
         </button>
-        <button className="titlebar-btn max-btn" onClick={handleMaximize} title="最大化">
+        <button className="titlebar-btn max-btn" onClick={() => window.electronAPI?.maximizeWindow()} title={t.titlebar.maximize}>
           □
         </button>
-        <button className="titlebar-btn close-btn" onClick={handleClose} title="吸附到边栏">
+        <button className="titlebar-btn close-btn" onClick={() => window.electronAPI?.closeWindow()} title={t.titlebar.close}>
           ✕
         </button>
       </div>
