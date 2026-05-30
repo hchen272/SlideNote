@@ -1,24 +1,20 @@
-# Slide Notes
+# Slide Note
 
-> A desktop sticky-note app that stays on top, docks to the screen edge like a bookmark, and supports Markdown with themes.
+> A desktop sticky-note app that stays on top, docks to the screen edge like a bookmark, and supports Markdown + rich-text editing with themes.
 
 [中文文档](README_CN.md)
-
-> ⚠️ **This project is under active development.** A one-click installer (`.exe` setup) will be available soon. For now, see [Setup](#setup) to run from source.
 
 ---
 
 ## Why This Exists
 
-In fact, when reviewing, I can't handle split-screen note-taking, and I'm too lazy to use pen to write... The left-right split-screen in Windows is also easily covered.
+Modern OS sticky-note tools have two fundamental flaws:
 
-Officially saying, Modern OS sticky-note tools have two fundamental flaws:
-
-1. **They don't stay on top.** Most built-in note apps (Sticky Notes on Windows, Stickies on macOS) get buried the moment you switch to another window. When you're reading a slide deck, watching a lecture, or referencing a document, your notes should be *persistently visible* — not hiding behind your active window.
+1. **They don't stay on top.** Most built-in note apps get buried the moment you switch to another window. When you're reading a slide deck, watching a lecture, or referencing a document, your notes should be *persistently visible* — not hiding behind your active window.
 
 2. **They take up too much space or are awkward to reach.** Traditional note apps either occupy valuable screen real estate or require Alt-Tab juggling. You need something that lives at the edge of your screen — always there, never in the way.
 
-**Slide Notes** solves both: it's always-on-top (except over fullscreen apps) and collapses into a tiny colored tab docked to the left or right edge of your screen. One click and it expands back to full size with all your notes intact.
+**Slide Note** solves both: always-on-top, and collapses into a tiny colored tab docked to the left or right edge of your screen. One click and it expands back to full size.
 
 **Core use case:** taking notes while reading slides, PDFs, or watching video lectures — without constantly switching windows.
 
@@ -28,16 +24,19 @@ Officially saying, Modern OS sticky-note tools have two fundamental flaws:
 
 - **Always on top** — stays visible above other windows (backs down for fullscreen apps)
 - **Edge docking** — collapses into a thin colored tab at the screen edge; drag to reposition
-- **3 themes** — Cyberpunk, Nature, Medieval
-- **Markdown + Rich Text** — dual editing modes: Markdown with live preview, or Slate.js rich-text with Word-like toolbar
-- **TODO lists** — checkable checkboxes with strikethrough (both Markdown and rich-text)
+- **4 themes** — Cyberpunk, Nature, Medieval, Minimal
+- **Markdown + Rich Text** — dual editing modes with one-click conversion
+- **TODO lists** — clickable checkboxes in both edit and preview modes
+- **Outline panel** — heading tree navigation, click to jump
+- **Note folders** — tag-based folder system with color labels, multi-select batch operations
 - **Links** — insert/edit links; Ctrl+Click to open in browser
-- **LaTeX formulas** — KaTeX rendering for inline `$...$` and block `$$...$$` formulas
-- **Tables** — insert tables with custom rows/cols; GFM table support in Markdown
-- **Note management** — create, delete, search, sort by creation time / modified time / word count
-- **Custom fonts** — adjustable font size, weight (bold/normal), and color per note
-- **Persistent storage** — all notes saved automatically; customizable storage path in Settings
-- **Bilingual** — Chinese / English UI, switchable in Settings
+- **LaTeX formulas** — KaTeX rendering for inline `$...$` and block `$$...$$`
+- **Tables** — custom-size tables; GFM table support
+- **Note management** — create, delete, search, sort (modified / created / word count / alphabetical)
+- **Custom fonts** — adjustable font size, weight, and color per note
+- **Per-note file storage** — each note saved as an individual JSON file for easy backup and Git tracking
+- **Custom data path** — configurable in Settings with auto-migration
+- **Bilingual** — Chinese / English UI
 
 ---
 
@@ -46,21 +45,24 @@ Officially saying, Modern OS sticky-note tools have two fundamental flaws:
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+ (v24 recommended)
-- npm (comes with Node.js)
+- npm
 
 ### Install & Run
 
 ```bash
-# Clone the repository
 git clone https://github.com/hchen272/SlideNote.git
-cd sticky-notes
-
-# Install dependencies
+cd SlideNote
 npm install
-
-# Start the app in development mode
 npm run electron:dev
 ```
+
+### Build Installer
+
+```bash
+npm run electron:build
+# Output: release/Slide Note Setup.exe
+```
+
 ---
 
 ## Usage
@@ -68,15 +70,16 @@ npm run electron:dev
 | Action | How |
 |--------|-----|
 | **New note** | Click **+ New Note** in the sidebar |
+| **New folder** | Click 📁+ next to New Note, pick a color |
 | **Edit / Preview** | Toggle 👁️ button in the toolbar |
-| **Switch theme** | Click the theme icon in the toolbar (🌆 Nights / 🌿 Nature / 🏰 Medieval) |
-| **Dock to edge** | Click ◀ in the titlebar or press `Ctrl+Shift+D` |
+| **Switch theme** | Toolbar theme dropdown (🌆 / 🌿 / 🏰 / ⬛) |
+| **Dock to edge** | Click ◀ in the titlebar or `Ctrl+Shift+D` |
 | **Expand from dock** | Click the colored tab at the screen edge |
-| **Move docked tab** | Drag the tab up/down along the edge |
-| **Search notes** | Use the search box in the sidebar |
-| **Sort notes** | Use the dropdown (by modified / created / word count) |
-| **Insert Markdown** | Use the toolbar buttons (H, **B**, *I*, ☑, etc.) |
-| **Change font** | Font size dropdown, B for bold toggle, A for color picker |
+| **Outline panel** | Click ☷ in the titlebar |
+| **Search notes** | Sidebar search box |
+| **Sort notes** | Sidebar dropdown (modified / created / word count / alphabetical) |
+| **Multi-select** | Click ☐ in the sort bar |
+| **Right-click note** | Delete, Add to folder, Remove from folder |
 | **Settings** | Click ⚙ at the bottom of the sidebar |
 
 ### Markdown Cheatsheet
@@ -97,18 +100,6 @@ npm run electron:dev
 
 ---
 
-## Custom Data Path
-
-By default, notes are saved to:
-
-```
-C:\Users\<You>\AppData\Roaming\sticky-notes\config.json
-```
-
-To change this, click ⚙ in the sidebar, enter a new folder path, and click **Save**. The change takes effect on the next launch.
-
----
-
 ## Tech Stack
 
 - **Electron** — desktop framework
@@ -117,35 +108,42 @@ To change this, click ⚙ in the sidebar, enter a new folder path, and click **S
 - **Slate.js** — rich-text editing
 - **marked** — Markdown rendering
 - **KaTeX** — LaTeX formula rendering
-- **electron-store** — local persistence
+- **electron-store** — app config persistence
 
 ---
 
 ## Roadmap
 
-### Done
+### Completed
 
 - [x] Always-on-top window with fullscreen-aware layering
-- [x] Edge-docking: collapse to a draggable colored tab, expand with a click
-- [x] 3 themes: Cyberpunk, Nature, Medieval
-- [x] Markdown editing with live preview
-- [x] Rich-text editing (Slate.js) with H1-H5 headings, inline marks
-- [x] TODO lists with checkable checkboxes
-- [x] Note management: create, delete, search, sort (by created / modified / word count)
+- [x] Edge-docking: collapse to a draggable colored tab, click to expand
+- [x] 4 themes: Cyberpunk, Nature, Medieval, Minimal
+- [x] Markdown editing with live preview and clickable TODO checkboxes
+- [x] Rich-text editing (Slate.js) with H1-H5 headings, inline marks, tables, formulas
+- [x] One-click Markdown ↔ Rich Text conversion
+- [x] Note management: create, delete, search, sort
 - [x] Per-note font customization (size, weight, color)
-- [x] Custom data storage path via Settings panel with auto-migration
-- [x] Local persistence with `electron-store`
-- [x] Chinese / English bilingual support
-- [x] Link support with Ctrl+Click to open in browser
-- [x] LaTeX formula support (KaTeX) — inline `$...$` and block `$$...$$`
-- [x] Table support — insert custom-size tables, GFM table converter
-- [x] Note tree structure
-- [x] Modify config arrangement
+- [x] Heading outline tree with click-to-jump navigation
+- [x] Note folders: tag-based, color labels, multi-select batch operations
+- [x] Right-click context menu for note actions
+- [x] Per-note JSON file storage (folder-based)
+- [x] Custom data storage path with auto-migration
+- [x] Chinese / English bilingual UI
+- [x] LaTeX formula support (KaTeX)
+- [x] Table support (custom-size + GFM)
+- [x] Alphabetical note sorting
+- [x] Scroll position memory across dock/undock
 
-### Up Next
+### Planned
 
-- [ ] UI / visual improvements
-- [ ] More themes?
-- [ ] Associated to corresponding slides (Inspired by the early plans of ShareNote Engine)
+- [ ] UI / visual polish
+- [ ] More themes
+- [ ] Slide integration (inspired by ShareNote Engine)
+- [ ] Image paste support
+- [ ] Export notes as Markdown files
+- [ ] Cloud sync
 
 ---
+
+[GitHub Link](https://github.com/hchen272/SlideNote)
