@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo, forwardRef, useImperativeHandle } from 'react'
+import React, { useState, useCallback, useRef, useMemo, forwardRef, useImperativeHandle, useEffect } from 'react'
 import { Descendant, Editor as SlateEditorType, Transforms } from 'slate'
 import { ReactEditor } from 'slate-react'
 import katex from 'katex'
@@ -11,6 +11,9 @@ import type { HeadingNode } from '../../types'
 import Toolbar from '../Toolbar/Toolbar'
 import SlateEditorComp, { editorRef as slateEditorRef } from './SlateEditor'
 import './Editor.css'
+
+// Module-level scroll cache — survives Editor unmount during dock→undock
+const scrollCache = { markdown: 0, preview: 0 }
 
 export interface EditorHandle {
   jumpToHeading: (heading: HeadingNode) => void
@@ -32,6 +35,24 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
   // Slate fires onChange with initialValue on mount; suppress this
   // first call to prevent overwriting persisted content (e.g. after dock→undock)
   const isSlateInitRef = useRef(true)
+
+  // ---- Scroll: track continuously, restore on mount after dock→undock ----
+  const onEditorScroll = useCallback(() => {
+    const ta = textareaRef.current
+    if (ta) { scrollCache.markdown = ta.scrollTop; return }
+    const pv = document.querySelector('.markdown-preview') as HTMLElement | null
+    if (pv) { scrollCache.preview = pv.scrollTop; return }
+  }, [])
+
+  useEffect(() => {
+    const restore = () => {
+      const ta = textareaRef.current
+      if (ta && scrollCache.markdown) { ta.scrollTop = scrollCache.markdown; return }
+      const pv = document.querySelector('.markdown-preview') as HTMLElement | null
+      if (pv && scrollCache.preview) { pv.scrollTop = scrollCache.preview; return }
+    }
+    requestAnimationFrame(() => requestAnimationFrame(restore))
+  }, [activeNoteId])
 
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!activeNoteId) return
@@ -272,6 +293,7 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
         <div className="editor-content">
           {previewMode ? (
             <div className="markdown-preview"
+              onScroll={onEditorScroll}
               style={{ fontSize: `${fontSettings.fontSize}px`, fontWeight: fontSettings.fontWeight, color: fontSettings.fontColor }}
               dangerouslySetInnerHTML={{ __html: renderedHtml }}
               onClick={(e) => {
@@ -292,6 +314,7 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
             <textarea ref={textareaRef} className="editor-textarea" value={activeNote.content}
               onChange={handleContentChange} placeholder={t.editor.placeholder}
               onMouseUp={handleTextareaTodoClick}
+              onScroll={onEditorScroll}
               style={{ fontSize: `${fontSettings.fontSize}px`, fontWeight: fontSettings.fontWeight, color: fontSettings.fontColor }}
               spellCheck={false}
             />
