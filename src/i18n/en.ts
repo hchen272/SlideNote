@@ -63,6 +63,7 @@ const en: Translations = {
     cyberpunk: 'Cyberpunk',
     nature: 'Nature',
     medieval: 'Medieval',
+    minimal: 'Minimal',
   },
   settings: {
     title: 'Settings',

@@ -35,7 +35,7 @@ export interface FontSettings {
   fontColor: string
 }
 
-export type ThemeName = 'cyberpunk' | 'nature' | 'medieval'
+export type ThemeName = 'cyberpunk' | 'nature' | 'medieval' | 'minimal'
 
 export type SortBy = 'createdAt' | 'modifiedAt' | 'wordCount' | 'title'
 

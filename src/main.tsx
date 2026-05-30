@@ -5,6 +5,7 @@ import './App.css'
 import './themes/cyberpunk.css'
 import './themes/nature.css'
 import './themes/medieval.css'
+import './themes/minimal.css'
 import './styles/global.css'
 import 'katex/dist/katex.min.css'
 

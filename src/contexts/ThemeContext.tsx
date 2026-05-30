@@ -10,12 +10,12 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'cyberpunk',
   setTheme: () => {},
-  themes: ['cyberpunk', 'nature', 'medieval'],
+  themes: ['cyberpunk', 'nature', 'medieval', 'minimal'],
 })
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeName>('cyberpunk')
-  const themes: ThemeName[] = ['cyberpunk', 'nature', 'medieval']
+  const themes: ThemeName[] = ['cyberpunk', 'nature', 'medieval', 'minimal']
 
   useEffect(() => {
     // Load saved theme

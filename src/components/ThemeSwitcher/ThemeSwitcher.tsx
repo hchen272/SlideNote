@@ -8,6 +8,7 @@ const themeIcons: Record<ThemeName, string> = {
   cyberpunk: '🌆',
   nature: '🌿',
   medieval: '🏰',
+  minimal: '⬛',
 }
 
 export default function ThemeSwitcher() {

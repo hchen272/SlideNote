@@ -61,6 +61,7 @@ const zh = {
     cyberpunk: '赛博朋克',
     nature: '自然',
     medieval: '中世纪',
+    minimal: '极简',
   },
   settings: {
     title: '设置',

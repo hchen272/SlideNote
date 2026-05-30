@@ -1,0 +1,38 @@
+.theme-minimal {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #141414;
+  --bg-hover: #1f1f1f;
+  --bg-input: #0d0d0d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --accent-primary: #ffffff;
+  --accent-secondary: #aaaaaa;
+  --accent-warn: #cccccc;
+  --border-color: #2a2a2a;
+  --border-glow: rgba(255, 255, 255, 0.05);
+  --shadow: none;
+  --gradient-bg: none;
+  --titlebar-bg: #000000;
+  --sidebar-bg: #050505;
+  --weather-bg: #050505;
+  --todo-checked: #ffffff;
+  --button-primary: #ffffff;
+  --button-hover: #cccccc;
+  --divider: #1f1f1f;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  --parchment: none;
+  --tab-color: #000000;
+  --tab-color-dark: #333333;
+}
+
+.theme-minimal .app-container {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+}
+
+.theme-minimal.docked {
+  background: var(--bg-primary);
+}

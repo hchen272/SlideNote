@@ -247,6 +247,8 @@ function createWindow() {
 
 function saveBounds() {
   if (!mainWindow || isDocked) return
+  // Don't save maximized bounds — they would overwrite the real normal size
+  if (mainWindow.isMaximized()) return
   const bounds = mainWindow.getBounds()
   store.set('windowBounds', bounds)
 }
@@ -311,6 +313,10 @@ function toggleDock() {
     mainWindow.setAlwaysOnTop(true, 'floating')
   } else {
     // Dock: shrink to a small bookmark tab
+    // Unmaximize first — a maximized window can't be resized to a docked tab
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize()
+    }
     const bounds = mainWindow.getBounds()
     const cursorPoint = screen.getCursorScreenPoint()
     const currentDisplay = screen.getDisplayNearestPoint(cursorPoint)
@@ -415,7 +421,7 @@ ipcMain.handle('close-window', () => {
 })
 
 ipcMain.handle('get-themes', () => {
-  return ['cyberpunk', 'nature', 'medieval']
+  return ['cyberpunk', 'nature', 'medieval', 'minimal']
 })
 
 // ---- Data path ----
