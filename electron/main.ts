@@ -44,6 +44,7 @@ function setDataPath(newPath: string): void {
 
   // Migrate notes folder to new path
   migrateNotesFolder(oldPath, newPath)
+  migrateFoldersFile(oldPath, newPath)
 
   // Delete old config file
   const oldConfig = join(oldPath, 'config.json')
@@ -141,6 +142,35 @@ function migrateNotesFolder(oldPath: string, newPath: string): void {
       writeFileSync(dst, data, 'utf-8')
     }
   } catch { /* ignore migration errors */ }
+}
+
+// ---- Folders storage (folders.json) ----
+
+const FOLDERS_FILE = 'folders.json'
+
+function getFoldersPath(): string {
+  return join(getDataPath(), FOLDERS_FILE)
+}
+
+function readFoldersFromDisk(): any[] {
+  const fp = getFoldersPath()
+  if (!existsSync(fp)) return []
+  try {
+    const data = JSON.parse(readFileSync(fp, 'utf-8'))
+    return Array.isArray(data) ? data : []
+  } catch { return [] }
+}
+
+function writeFoldersToDisk(folders: any[]): void {
+  writeFileSync(getFoldersPath(), JSON.stringify(folders, null, 2), 'utf-8')
+}
+
+function migrateFoldersFile(oldPath: string, newPath: string): void {
+  const src = join(oldPath, FOLDERS_FILE)
+  const dst = join(newPath, FOLDERS_FILE)
+  if (existsSync(src)) {
+    writeFileSync(dst, readFileSync(src, 'utf-8'), 'utf-8')
+  }
 }
 
 const storeDefaults = {
@@ -347,6 +377,15 @@ ipcMain.handle('get-notes', () => {
 
 ipcMain.handle('save-notes', (_event, notes: any[]) => {
   writeNotesToDisk(notes)
+  return true
+})
+
+ipcMain.handle('get-folders', () => {
+  return readFoldersFromDisk()
+})
+
+ipcMain.handle('save-folders', (_event, folders: any[]) => {
+  writeFoldersToDisk(folders)
   return true
 })
 

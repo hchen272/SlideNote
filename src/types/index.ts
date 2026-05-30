@@ -9,6 +9,13 @@ export interface HeadingNode {
   id: string               // unique id for React key & scroll targeting
 }
 
+export interface Folder {
+  id: string
+  name: string
+  color: string           // hex color for the folder tag
+  createdAt: number
+}
+
 export interface Note {
   id: string
   title: string
@@ -19,6 +26,7 @@ export interface Note {
   modifiedAt: number
   wordCount: number
   fontSettings: FontSettings
+  folderIds?: string[]     // folders this note belongs to (tag-style, multi-folder)
 }
 
 export interface FontSettings {
@@ -66,6 +74,8 @@ export interface ElectronAPI {
   pickFolder: () => Promise<string | null>
   openUrl: (url: string) => Promise<void>
   getThemes: () => Promise<string[]>
+  getFolders: () => Promise<Folder[]>
+  saveFolders: (folders: Folder[]) => Promise<boolean>
 }
 
 declare global {

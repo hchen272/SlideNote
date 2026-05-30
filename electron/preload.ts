@@ -33,6 +33,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Themes
   getThemes: () => ipcRenderer.invoke('get-themes'),
+
+  // Folders
+  getFolders: () => ipcRenderer.invoke('get-folders'),
+  saveFolders: (folders: any[]) => ipcRenderer.invoke('save-folders', folders),
 })
 
 export {}
