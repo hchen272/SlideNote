@@ -4,6 +4,8 @@
 
 [中文文档](README_CN.md)
 
+> ⚠️ **This project is under active development.** For now, see [Setup](#setup) to run from source, or use `npm run electron:build` to create an installer.
+
 ---
 
 ## Why This Exists
