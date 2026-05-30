@@ -75,9 +75,12 @@
   overflow-y: auto;
 }
 
+.slate-scroll-inner {
+  min-height: 100%;
+}
+
 .slate-editable {
   padding: 16px;
-  min-height: 100%;
   outline: none;
   font-family: var(--font-family);
   line-height: 1.7;

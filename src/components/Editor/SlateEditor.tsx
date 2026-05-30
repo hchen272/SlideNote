@@ -265,19 +265,21 @@ export default function SlateEditor({ value, onChange, fontSettings }: SlateEdit
       <Slate editor={editor} initialValue={displayValue} onChange={handleChange}>
         <SlateToolbar />
         <div className="slate-content">
-          <Editable
-            className="slate-editable"
-            renderElement={ElementRenderer}
-            renderLeaf={LeafRenderer}
-            placeholder={t.editor.placeholder}
-            spellCheck={false}
-            autoFocus
-            style={{
-              fontSize: `${fs.fontSize}px`,
-              fontWeight: fs.fontWeight,
-              color: fs.fontColor,
-            }}
-          />
+          <div className="slate-scroll-inner">
+            <Editable
+              className="slate-editable"
+              renderElement={ElementRenderer}
+              renderLeaf={LeafRenderer}
+              placeholder={t.editor.placeholder}
+              spellCheck={false}
+              autoFocus
+              style={{
+                fontSize: `${fs.fontSize}px`,
+                fontWeight: fs.fontWeight,
+                color: fs.fontColor,
+              }}
+            />
+          </div>
         </div>
       </Slate>
     </div>

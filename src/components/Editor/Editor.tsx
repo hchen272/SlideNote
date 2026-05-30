@@ -12,8 +12,8 @@ import Toolbar from '../Toolbar/Toolbar'
 import SlateEditorComp, { editorRef as slateEditorRef } from './SlateEditor'
 import './Editor.css'
 
-// Module-level scroll cache — survives Editor unmount during dock→undock
-const scrollCache = { markdown: 0, preview: 0 }
+// Module-level state cache — survives Editor unmount during dock→undock
+const stateCache = { markdown: 0, preview: 0, slate: 0, previewMode: false }
 
 export interface EditorHandle {
   jumpToHeading: (heading: HeadingNode) => void
@@ -23,8 +23,11 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
   const { notes, activeNoteId, updateNote } = useNotes()
   const { theme } = useTheme()
   const { t } = useLang()
-  const [previewMode, setPreviewMode] = useState(false)
+  const [previewMode, setPreviewMode] = useState(stateCache.previewMode)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Sync previewMode to cache whenever it changes
+  useEffect(() => { stateCache.previewMode = previewMode }, [previewMode])
 
   const activeNote = notes.find(n => n.id === activeNoteId)
   const isSlate = activeNote?.contentType === 'slate'
@@ -39,17 +42,45 @@ const Editor = forwardRef<EditorHandle>(function Editor(_props, ref) {
   // ---- Scroll: track continuously, restore on mount after dock→undock ----
   const onEditorScroll = useCallback(() => {
     const ta = textareaRef.current
-    if (ta) { scrollCache.markdown = ta.scrollTop; return }
+    if (ta) { stateCache.markdown = ta.scrollTop; return }
     const pv = document.querySelector('.markdown-preview') as HTMLElement | null
-    if (pv) { scrollCache.preview = pv.scrollTop; return }
+    if (pv) { stateCache.preview = pv.scrollTop; return }
   }, [])
+
+  // Slate: track scroll + fix wheel interception by contentEditable
+  useEffect(() => {
+    if (!isSlate) return
+    const id = requestAnimationFrame(() => {
+      const el = document.querySelector('.slate-content') as HTMLElement | null
+      if (!el) return
+      // Track scroll
+      el.onscroll = () => { stateCache.slate = el.scrollTop }
+      // Capture wheel events before contentEditable can intercept them
+      const onWheel = (e: WheelEvent) => {
+        const atTop = el.scrollTop <= 0 && e.deltaY < 0
+        const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1 && e.deltaY > 0
+        if (atTop || atBottom) return // allow overscroll to bubble
+        e.preventDefault()
+        el.scrollTop += e.deltaY
+      }
+      el.addEventListener('wheel', onWheel, { capture: true, passive: false })
+      ;(el as any).__wheelFix = onWheel
+    })
+    return () => {
+      cancelAnimationFrame(id)
+      const el = document.querySelector('.slate-content') as any
+      if (el?.__wheelFix) el.removeEventListener('wheel', el.__wheelFix, { capture: true })
+    }
+  }, [isSlate])
 
   useEffect(() => {
     const restore = () => {
       const ta = textareaRef.current
-      if (ta && scrollCache.markdown) { ta.scrollTop = scrollCache.markdown; return }
+      if (ta && stateCache.markdown) { ta.scrollTop = stateCache.markdown; return }
       const pv = document.querySelector('.markdown-preview') as HTMLElement | null
-      if (pv && scrollCache.preview) { pv.scrollTop = scrollCache.preview; return }
+      if (pv && stateCache.preview) { pv.scrollTop = stateCache.preview; return }
+      const sl = document.querySelector('.slate-content') as HTMLElement | null
+      if (sl && stateCache.slate) { sl.scrollTop = stateCache.slate; return }
     }
     requestAnimationFrame(() => requestAnimationFrame(restore))
   }, [activeNoteId])
